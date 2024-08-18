@@ -205,9 +205,10 @@ class GridViewWidget extends StatelessWidget {
             physics: BouncingScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: value.gridSizeY,
-              mainAxisExtent:10,
-              mainAxisSpacing: 2.0,
-              crossAxisSpacing: 2.0,
+              // mainAxisExtent:10,
+              // mainAxisSpacing: 2.0,
+              childAspectRatio: 1,
+              // crossAxisSpacing: 2.0,
             ),
             itemCount: value.gridSizeX * value.gridSizeY,
             itemBuilder: (context, index) {
@@ -318,7 +319,8 @@ class NormalNavBar extends StatelessWidget {
                            IconButton(onPressed: () async {
                             AppUtility.popOver(context, ListItems(count:2 ,
                               content:addMap ,),
-                              heightSize: 120
+                              heightSize: context.height*0.9,
+                              widthSize: context.width*0.6
                             );
 
 

@@ -115,7 +115,7 @@ class MainDashboardController extends ChangeNotifier{
       _showBottomSheetVideo=false;
       _showBottomSheet=false;
       AppUtility.popOver(context,EditPopOver(title: title, picture: picture),
-          direct: PopoverDirection.bottom  ,heightSize: context.height*0.4,widthSize: context.width*0.3);
+          direct: PopoverDirection.bottom  ,heightSize: context.height*0.9,widthSize: context.width*0.8);
 
 
     }
