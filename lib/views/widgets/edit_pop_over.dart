@@ -1,16 +1,20 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:word_toob/app_providers/main_dashboard_controller.dart';
 import 'package:word_toob/common/app_constants/assets.dart';
+import 'package:word_toob/common/app_constants/route_strings.dart';
 import 'package:word_toob/common/utils/app_utility.dart';
 import 'package:word_toob/views/theme/app_color.dart';
 import 'package:word_toob/views/widgets/custom_bottom_sheet.dart';
 import 'package:word_toob/views/widgets/custom_bottom_sheet_video.dart';
+import 'package:word_toob/views/widgets/video_thumbnail_fleet.dart';
 import 'package:word_toob/views/widgets/video_widget.dart';
 
 class EditPopOver extends StatefulWidget {
@@ -25,99 +29,158 @@ class EditPopOver extends StatefulWidget {
 
 class _EditPopOverState extends State<EditPopOver> {
 
-
+  TextEditingController _controller=TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+}
+  @override
   Widget build(BuildContext context) {
+    double fontSize=context.height*0.02;
+
     return Consumer<MainDashboardController>(
       builder: (context, mainDashboardController, child) =>
        Stack(
         children: [
-          Column(
-            children: [
-              GrayContainerWidget(blueButton: "Edit",title: widget.title,
-                blueButtonOnTap: (){},),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                GrayContainerWidget(blueButton:mainDashboardController.isEditPressed?"Done": "Edit",title: widget.title,
+                  blueButtonOnTap: (){
+                  mainDashboardController.isEditPressedFun();
+                  setState(() {
+                    _controller.text=widget.title;
 
-              IntrinsicHeight(
+                  });
 
-                child: Row(
-                  children: [
-                    Gap(10),
+                  },),
+            
+                IntrinsicHeight(
+            
+                  child: Row(
+                    children: [
+                      Gap(10),
+            
+                      Column(
+                        children: [
 
-                    Column(
-                      children: [
+                          Gap(10),
 
-                        Text(widget.title,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColor.appPrimaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        Gap(10),
-                        GestureDetector(
-                          onTap: () {
-                            mainDashboardController.toggleBottomSheet();
-                          },
-                          child: mainDashboardController.imagePath=="" ?CachedNetworkImage(
-                            height: 60,
-                            imageUrl: widget.picture,):Image.file(File(mainDashboardController.imagePath),height: 80,width: 80,),
-
-                        ),
-                        Gap(10),
-
-                        Text("Edit Picture",
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColor.appPrimaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Gap(10),
-
-                        Text("Hide Word",
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColor.appPrimaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                       mainDashboardController.isEditPressed?           SizedBox(
+                         width: context.width*0.1,
+                         child: TextFormField(
+                           onTapOutside: (e){FocusManager.instance.primaryFocus?.unfocus();},
 
 
 
-                      ],
-                    ),
-                    VerticalDivider(color: AppColor.shadowColor2,thickness: 2,),
+                           // prefixIcon: Icon(Icons.search,size:iconSize+2,),
 
-                    Column(
-                      children: [
-                        Text("2 Videos",
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColor.appPrimaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Gap(10),
-                        GestureDetector(
-                          onTap: () {
-                            mainDashboardController.toggleBottomSheetVideo();
-                          },
-                          child: Text("Add Videos",
+                           style: TextStyle(fontSize: fontSize,color: AppColor.appPrimaryColor),
+
+                           controller: _controller,
+                           decoration: InputDecoration(
+                           ),
+
+                         ),
+                       )
+                        :   Text(widget.title,
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColor.appPrimaryColor,
                               fontWeight: FontWeight.bold,
+                              fontSize: fontSize
                             ),
                           ),
-                        ),
-                        Divider(color: AppColor.shadowColor2,thickness: 2,),
-                        Column(
-                          children: List.generate(mainDashboardController.videos.length, (index) =>VideoThumbnail(mainDashboardController.videos[index])
-                        )
-                        )
+            
+                          Gap(10),
+                          GestureDetector(
+                            onTap: () {
+                              mainDashboardController.toggleBottomSheet();
+                            },
+                            child: mainDashboardController.imagePath=="" ?CachedNetworkImage(
+                              height: 60,
+                              imageUrl: widget.picture,):Image.file(File(mainDashboardController.imagePath),height: 80,width: 80,),
+            
+                          ),
+                          Gap(10),
+            
+                          Text("Edit Picture",
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColor.appPrimaryColor,
+                              fontWeight: FontWeight.bold,
+                                fontSize: fontSize
 
-                      ],
-                    )
-                  ],
-                ),
-              )
-            ],
+                            ),
+                          ),
+                          Gap(10),
+            
+                          Text("Hide Word",
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColor.appPrimaryColor,
+                              fontWeight: FontWeight.bold,
+                                fontSize: fontSize
+
+                            ),
+                          ),
+            
+            
+            
+                        ],
+                      ),
+                      VerticalDivider(color: AppColor.shadowColor2,thickness: 2,),
+            
+                      Expanded(
+                        child: Column(
+
+                          children: [
+                            Gap(10),
+
+                            Text("${mainDashboardController.videos.length} Videos",
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColor.appPrimaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: fontSize
+                              ),
+                            ),
+                            Gap(10),
+                            GestureDetector(
+                              onTap: () {
+                                mainDashboardController.toggleBottomSheetVideo();
+                              },
+                              child: Text("Add Videos",
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.bold,
+
+                                ),
+                              ),
+                            ),
+                            Divider(color: AppColor.shadowColor2,thickness: 2,),
+                            Column(
+                              children: List.generate(mainDashboardController.videos.length, (index) {
+                                final video=mainDashboardController.videos[index];
+                                return VideoUploadWidget(
+                                  isEditPressed: mainDashboardController.isEditPressed,
+                                  onTapRemove: (){
+                                  mainDashboardController. removeVideosFromList(index);
+                                  }, video: video,onTap: () {
+                                  Navigator.pushNamed(context, RouteStrings.videoPlayer, arguments: video);
+                        
+                                },);
+                              }
+                            )
+                            )
+                                    
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
 
           if (mainDashboardController.showBottomSheetVideo)

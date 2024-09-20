@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:typed_data';
+
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flash/flash_helper.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -25,11 +29,15 @@ import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
+import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/app_providers/main_dashboard_controller.dart';
 import 'package:word_toob/common/app_constants/app_strings.dart';
 import 'package:word_toob/common/app_constants/general.dart';
 import 'package:word_toob/common/app_constants/route_strings.dart';
+import 'package:word_toob/source/models/grid_size_model.dart';
 import 'package:word_toob/views/theme/app_color.dart';
+
+import '../../source/models/grid_model.dart';
 
 
 abstract class AppUtility {
@@ -256,6 +264,7 @@ abstract class AppUtility {
   static Future<XFile?> videoFromGallery()async{
     var video = await ImagePicker()
         .pickVideo(source: ImageSource.gallery);
+    print(video!.path);
     return video;
   }
 
@@ -812,11 +821,21 @@ abstract class AppUtility {
   // }
 
 
+  static Future<Uint8List> loadAssetImageAsUint8List(String path) async {
+    // Load the image as ByteData
+    ByteData byteData = await rootBundle.load(path);
+
+    // Convert ByteData to Uint8List
+    Uint8List uint8list = byteData.buffer.asUint8List();
+
+    return uint8list;
+  }
 
   static void showCustomDialog({
     required BuildContext context,
+    required ContentProvider contentProvider,
     required String title,
-    required List<Map<String,dynamic>> list,
+    required List<GridSizeModel> list,
   }) {
     showDialog(
         context: context,
@@ -847,7 +866,11 @@ abstract class AppUtility {
                         children: list
                             .map((item) => GestureDetector(
                             onTap: (){
-                              value.setGridSize(item["gridSizeX"], item["gridSizeY"]);
+                       GridSizeModel model=       GridSizeModel(gridSizeX: item.gridSizeX, hideModel: false, gridSizeY: item.gridSizeY,listData: List.generate(item.listData?.length??0, (index) => GridModel(),));
+                              value.setGridSize(item.gridSizeX??1, item.gridSizeY??2);
+                              value.setGridSizedModel(model);
+                              contentProvider.saveGridSizedModel(gridSizedModel:model );
+
                               Navigator.pop(context);
 
                             },
@@ -857,7 +880,7 @@ abstract class AppUtility {
                                                   width: double.infinity,
                                                   child: Text(
                                                     textAlign: TextAlign.left,
-                                                    item["name"],  style: Theme.of(context).textTheme.bodySmall
+                                                    item.title??"",  style: Theme.of(context).textTheme.bodySmall
                                                       ?.copyWith(
                                                     color: AppColor.appPrimaryColor,
                                                     fontWeight: FontWeight.bold,
@@ -914,9 +937,9 @@ abstract class AppUtility {
                             child: Text("cancel")),
                         TextButton(
                             onPressed: () async {
-                              Future.microtask(() =>
-                                  Navigator.popAndPushNamed(
-                                      context, RouteStrings.loginView));
+                              // Future.microtask(() =>
+                              //     Navigator.popAndPushNamed(
+                              //         context, RouteStrings.loginView));
                               // Future.microtask(() =>
                               //     Navigator.pushAndRemoveUntil(
                               //         context,
@@ -944,7 +967,9 @@ abstract class AppUtility {
   }
 
 
-  static void popOver(BuildContext context, Widget List,{double heightSize=400,PopoverDirection direct=PopoverDirection.bottom,double widthSize=120 }) async {
+
+
+  static void popOver(BuildContext context, Widget List,{double heightSize=400,PopoverDirection direct=PopoverDirection.bottom,double widthSize=120 ,List<Widget>? listWidget,Widget? title}) async {
     await showPopover(
       context: context,
 

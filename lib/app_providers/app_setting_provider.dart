@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:word_toob/common/app_constants/app_keys.dart';
 
+enum Status { initial, error, loading, loaded }
 
 class AppSettingsProvider extends ChangeNotifier{
 

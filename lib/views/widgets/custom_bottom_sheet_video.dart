@@ -47,6 +47,8 @@ class CustomBottomSheetVideo extends StatelessWidget {
                 print(video!.path);
 
                 controller.addVideoToList(video.path,);
+                controller.toggleBottomSheetOffVideo();
+
 
 
 

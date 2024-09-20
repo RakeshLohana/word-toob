@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:word_toob/app_providers/app_setting_provider.dart';
+import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/app_providers/main_dashboard_controller.dart';
 import 'package:word_toob/common/app_constants/app_strings.dart';
 import 'package:word_toob/common/app_constants/route_strings.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _appSettingsProvider = sl<AppSettingsProvider>();
   final _mainDashboardController = sl<MainDashboardController>();
-  // final _loginController = sl<LoginController>();
+  final _contentProvider = sl<ContentProvider>();
   // final _chatMessage = sl<ChatProvider>();
 
   @override
@@ -31,6 +32,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider.value(value: _appSettingsProvider),
         ChangeNotifierProvider.value(value: _mainDashboardController),
+        ChangeNotifierProvider.value(value: _contentProvider),
 
 
       ],

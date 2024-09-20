@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:word_toob/common/app_constants/route_strings.dart';
+import 'package:word_toob/common/utils/navigation_animation.dart';
 import 'package:word_toob/views/screens/main_dashboard.dart';
+import 'package:word_toob/views/widgets/video_thumbnail_fleet.dart';
+
+import '../views/screens/homepage.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -15,6 +19,8 @@ class RouteGenerator {
         return MaterialPageRoute(
             builder: (_) => const ResponsiveWrap(child: MainDashboard())
         );
+      case RouteStrings.videoPlayer:
+        return SwipeLeftAnimationRoute(widget: ResponsiveWrap(child: VideoPlayerView(url: args as String)));
 
 
 

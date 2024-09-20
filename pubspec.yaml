@@ -53,6 +53,14 @@ dependencies:
   path_provider: ^2.1.4
   video_player: ^2.9.1
   responsive_grid_list: ^1.4.0
+  chewie: ^1.8.3
+  video_thumbnail: ^0.5.3
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  flutter_tts: ^4.0.2
+  flutter_translate: ^4.1.0
+  flutter_localization: ^0.2.2
+
 
 
 dev_dependencies:
@@ -65,6 +73,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+  isar_generator: ^3.1.0+1
+  build_runner: ^2.4.11
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -78,9 +88,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/images/symbolset-emotions/
+    - assets/images/symbolset-basic/
+    - assets/images/videos/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
