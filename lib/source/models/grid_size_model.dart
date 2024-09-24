@@ -3,6 +3,7 @@ import 'package:word_toob/source/models/grid_model.dart';
 import 'package:word_toob/source/models/isar_collection/grid_sized_local.dart';
 
 class GridSizeModel{
+  int? id;
    late int duplicateCount;
   int? gridSizeX;
   int? gridSizeY;
@@ -13,6 +14,7 @@ class GridSizeModel{
 
 
   GridSizeModel({
+    this.id,
     this.gridSizeX,
     this.hideModel,
     this.gridSizeY,
@@ -42,6 +44,7 @@ class GridSizeModel{
       hideModel = localDetails.hideModel;
       currentSelected=localDetails.currentSelected??false;
       duplicateCount=localDetails.duplicateCount??1;
+       id=localDetails.id;
     }catch(e){
       printLog("GridSizeModel.fromLocal: $e");
     }

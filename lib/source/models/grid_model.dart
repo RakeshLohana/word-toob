@@ -4,6 +4,7 @@ import 'package:isar/isar.dart';
 
 @embedded
 class GridModel {
+  int? _id;
   String? _title;
   String? _imagepath;
   List<String>? _videosPath;
@@ -16,11 +17,14 @@ class GridModel {
     List<String>? videosPath,
     bool? hideImage,
     bool? hidetitle,
+    int? id
   })  : _title = title,
+  _id=id,
         _imagepath = imagepath,
         _videosPath = videosPath,
         _hideImage = hideImage,
         _hidetitle = hidetitle;
+
 
   // Getters
   String? get title => _title;
@@ -28,6 +32,7 @@ class GridModel {
   List<String>? get videosPath => _videosPath;
   bool? get hideImage => _hideImage;
   bool? get hidetitle => _hidetitle;
+  int? get id => _id;
 
   // Setters
   set title(String? value) {
@@ -50,6 +55,10 @@ class GridModel {
     _hidetitle = value;
   }
 
+  set setId(int? id) {
+    _id = id;
+  }
+
   // fromJson method
   factory GridModel.fromJson(Map<String, dynamic> json) {
     return GridModel(
@@ -58,6 +67,7 @@ class GridModel {
       videosPath: json['videosPath'] != null ? List<String>.from(json['videosPath']) : null,
       hideImage: json['hideImage'],
       hidetitle: json['hidetitle'],
+      id: json['id'],
     );
   }
 
@@ -69,6 +79,7 @@ class GridModel {
       'videosPath': _videosPath,
       'hideImage': _hideImage,
       'hidetitle': _hidetitle,
+      'id': _id,
     };
   }
 

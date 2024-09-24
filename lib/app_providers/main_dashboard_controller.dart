@@ -180,7 +180,7 @@ class MainDashboardController extends ChangeNotifier{
 
    getImagePath(String imagePath){
      _imagePath=imagePath;
-     print(_imagePath);
+
      notifyListeners();
    }
 
@@ -230,7 +230,7 @@ class MainDashboardController extends ChangeNotifier{
 
 
 
-  void setItemOnEditState(int index,BuildContext context,{required String title,required String picture, }) {
+  void setItemOnEditState(int index,BuildContext context,{required String title,required String picture,required int id,required List<String> videoPath }) {
 
     if (_editPressed) {
       _itemClickedOnEditState = index;
@@ -238,9 +238,12 @@ class MainDashboardController extends ChangeNotifier{
       _showBottomSheetVideo=false;
       _showBottomSheet=false;
       _isEditPressed=false;
-      AppUtility.popOver(context,EditPopOver(title: title, picture: picture),
+      AppUtility.popOver(context,EditPopOver(title: title, picture: picture,index: index,id: id,),
 
           direct: PopoverDirection.top  ,heightSize: context.height*1.2,widthSize: context.width*0.9);
+      _videos.clear();
+      _videos=videoPath;
+      notifyListeners();
 
 
     }

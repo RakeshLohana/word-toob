@@ -1,6 +1,8 @@
 import 'package:word_toob/source/core/client_local.dart';
 import 'package:word_toob/source/models/grid_size_model.dart';
 
+import '../models/grid_model.dart';
+
 abstract class ILocalDataSource{
 
   final LocalClient localClient;
@@ -11,6 +13,26 @@ abstract class ILocalDataSource{
   Future<List<GridSizeModel>> getAllGridSizedModel();
   Future<void> saveAllGridSizedModel({required List<GridSizeModel> gridSizedModelList});
   Future<void> saveGridSizedModel({required GridSizeModel gridSizedModel});
+  Future<void> updateGridSizedModel({
+    required int id, // Assuming there's an ID to identify the specific model
+    String? title,
+    bool? hideModel,
+    List<GridModel>? listData,
+    int? gridSizeX,
+    int? gridSizeY,
+    bool? currentSelected,
+    int? duplicateCount,
+  });
+
+  Future<void> updateGridSizedModelListDataItem({
+    required int id,  // ID of the GridSizedModel
+    required int itemIndex,  // Index of the listData item to update
+    String? title,
+    String? imagePath,
+    List<String>? videosPath,
+    bool? hideImage,
+    bool? hideTitle,
+  });
 
 
 
@@ -40,6 +62,41 @@ class LocalDataSource extends ILocalDataSource{
     return response;
   }
 
+
+@override
+  Future<void> updateGridSizedModel({
+    required int id, // Assuming there's an ID to identify the specific model
+    String? title,
+    bool? hideModel,
+    List<GridModel>? listData,
+    int? gridSizeX,
+    int? gridSizeY,
+    bool? currentSelected,
+    int? duplicateCount,
+  }) async {
+    final response = await localClient.
+    updateGridSizedModel(id: id,title: title,gridSizeX: gridSizeX,gridSizeY: gridSizeY,listData: listData,hideModel: hideModel,
+    currentSelected: currentSelected,duplicateCount: duplicateCount);
+    return response;
+  }
+
+
+  @override
+  Future<void> updateGridSizedModelListDataItem({
+    required int id,  // ID of the GridSizedModel
+    required int itemIndex,  // Index of the listData item to update
+    String? title,
+    String? imagePath,
+    List<String>? videosPath,
+    bool? hideImage,
+    bool? hideTitle,
+  }) async {
+    final response = await localClient.
+    updateGridSizedModelListDataItem(
+      id: id,itemIndex: itemIndex,title: title,hideImage: hideImage,videosPath: videosPath,hideTitle: hideTitle,imagePath: imagePath
+    );
+    return response;
+  }
 
 
 }

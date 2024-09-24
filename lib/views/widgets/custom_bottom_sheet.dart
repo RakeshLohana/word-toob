@@ -6,9 +6,14 @@ import 'package:word_toob/app_providers/main_dashboard_controller.dart';
 import 'package:word_toob/common/utils/app_utility.dart';
 import 'package:word_toob/views/theme/app_color.dart';
 
+import '../../app_providers/content_provider.dart';
+
 class CustomBottomSheet extends StatelessWidget {
+  final int id;
+  final int index;
   final MainDashboardController controller;
-  CustomBottomSheet({required this.controller});
+ final ContentProvider contentProvider;
+  CustomBottomSheet({required this.controller, required this.id, required this.index, required this.contentProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +31,15 @@ class CustomBottomSheet extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 GestureDetector(
-                  onTap: () {
-                    AppUtility.imageFromCamera();
+                  onTap: () async {
+                  var image=  await AppUtility.imageFromCamera();
+                    controller.getImagePath(image!.path);
+                  contentProvider.updateListDataItem(id: id, itemIndex: index,imagePath: image.path);
+                  await contentProvider.getAllGridSizeModel();
+
+                  controller.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
+                  controller.setGridSizedModel(contentProvider.allGridSizedModel[index]);
+                  controller.toggleBottomSheetOff();
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 6),
@@ -45,7 +57,11 @@ class CustomBottomSheet extends StatelessWidget {
 
                 var image=  await AppUtility.imageFromGallery();
                 controller.getImagePath(image!.path);
+                contentProvider.updateListDataItem(id: id, itemIndex: index,imagePath: image.path);
+                controller.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
+                controller.setGridSizedModel(contentProvider.allGridSizedModel[index]);
                 controller.toggleBottomSheetOff();
+
 
 
                   },

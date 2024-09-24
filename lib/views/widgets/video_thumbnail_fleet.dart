@@ -112,16 +112,19 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
     });
   }
 
-  generateThumbnail() async {
+ Future generateThumbnail() async {
     Directory dir = await getApplicationCacheDirectory();
-    final fileName = await VideoThumbnail.thumbnailFile(
-      video: widget.video,
-      thumbnailPath: dir.path,
-      imageFormat: ImageFormat.PNG,
-      maxHeight: 20,
-      // maxWidth: 80,
-      quality: 100,
-    );
+    String? fileName="";
+    fileName = await VideoThumbnail.thumbnailFile(
+        video: widget.video,
+        thumbnailPath: dir.path,
+        imageFormat: ImageFormat.PNG,
+        maxHeight: 20,
+        // maxWidth: 80,
+        quality: 100,
+      );
+
+
     printLog(fileName);
     if(fileName != null){
       setState(() {
@@ -134,7 +137,7 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
 
   @override
   void initState() {
-    generateThumbnail();
+   Future.microtask(()=> generateThumbnail());
     super.initState();
   }
 
@@ -217,20 +220,37 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   late VideoPlayerController _controller;
   @override
   void initState() {
-    _controller = VideoPlayerController.asset(widget.url,
-        videoPlayerOptions: VideoPlayerOptions(
+    if(widget.url.contains("asset")){
+      _controller = VideoPlayerController.asset(widget.url,
+          videoPlayerOptions: VideoPlayerOptions(
 
-        ))
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {
-          _controller.play();
+          ))
+        ..initialize().then((_) {
+          setState(() {
+            _controller.play();
+          });
         });
+      super.initState();
+      _controller.addListener(() {
+        setState(() {});
       });
-    super.initState();
-    _controller.addListener(() {
-      setState(() {});
-    });
+
+    }else{
+      _controller = VideoPlayerController.file(File(widget.url),
+          videoPlayerOptions: VideoPlayerOptions(
+
+          ))
+        ..initialize().then((_) {
+          setState(() {
+            _controller.play();
+          });
+        });
+      super.initState();
+      _controller.addListener(() {
+        setState(() {});
+      });
+    }
+
   }
 
   @override

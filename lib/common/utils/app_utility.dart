@@ -866,7 +866,9 @@ abstract class AppUtility {
                         children: list
                             .map((item) => GestureDetector(
                             onTap: (){
-                       GridSizeModel model=       GridSizeModel(gridSizeX: item.gridSizeX, hideModel: false, gridSizeY: item.gridSizeY,listData: List.generate(item.listData?.length??0, (index) => GridModel(),));
+                       GridSizeModel model=       GridSizeModel(gridSizeX: item.gridSizeX, hideModel: false,
+                           title: item.title,
+                           gridSizeY: item.gridSizeY,listData: List.generate(item.listData?.length??0, (index) => GridModel(),));
                               value.setGridSize(item.gridSizeX??1, item.gridSizeY??2);
                               value.setGridSizedModel(model);
                               contentProvider.saveGridSizedModel(gridSizedModel:model );

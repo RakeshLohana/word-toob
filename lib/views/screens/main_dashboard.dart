@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -45,7 +46,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
 
   List<GridSizeModel> gridModelList=[
-   ///
+   ///emotions
     GridSizeModel(title: AppString.emotions,gridSizeX: 4,gridSizeY: 4,hideModel: false,
 
         listData: [
@@ -163,6 +164,8 @@ class _MainDashboardState extends State<MainDashboard> {
 
         ]
     ),
+
+    ///numbers
     GridSizeModel(title:AppString.numbers ,gridSizeX:5 ,gridSizeY:5 ,hideModel: false,
 
         listData: [
@@ -217,6 +220,23 @@ class _MainDashboardState extends State<MainDashboard> {
 
 
     List<Map<String,dynamic>> customDialogList=[
+      {"name":"Emotions",
+        "gridSizeX":4,
+        "gridSizeY":4,
+      },
+
+      {"name":"First 25 Words",
+        "gridSizeX":5,
+        "gridSizeY":5,
+      },
+      {"name":"Alphabets",
+        "gridSizeX":5,
+        "gridSizeY":6,
+      },
+      {"name":"Numbers",
+        "gridSizeX":5,
+        "gridSizeY":5,
+      },
       {"name":"2 words",
         "gridSizeX":1,
         "gridSizeY":2,
@@ -268,9 +288,7 @@ class _MainDashboardState extends State<MainDashboard> {
         ),
       );
     })
-        .toList().reversed.toList();
-    gridSizeModelInitialized.addAll(_contentProvider.allGridSizedModel.reversed.toList());
-       int gridSize = 5;
+        .toList();
 
 
 
@@ -360,12 +378,11 @@ class GridViewWidget extends StatelessWidget {
                      GestureDetector(
                       onTap: () {
                         // value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy );
-                        value.setItemOnEditState(index,context,title:grid.title??'' ,picture: grid.imagepath??MyAssets.happy );
+                        value.setItemOnEditState(index,context,title:grid.title??'' ,picture: grid.imagepath??MyAssets.happy,id: value.gridSizedModel.id??-1,videoPath: grid.videosPath??[] );
                         if(!value.editPressed){
                           value.flutterTts.speak(  grid.title??"nothing");
-                          if(grid.videosPath!.isNotEmpty && grid.videosPath!.length>1){
+                          if(grid.videosPath?.isNotEmpty??true   && grid.videosPath!.length>1){
                             var rand=Random().nextInt(grid.videosPath?.length??0+1);
-                            print(rand);
                             Navigator.pushNamed(context, RouteStrings.videoPlayer,arguments: grid.videosPath?[rand]);
                           }
 
@@ -398,7 +415,8 @@ class GridViewWidget extends StatelessWidget {
                                 ),
                                 SizedBox(height: context.height*0.02), // Add spacing between text and image
                              value.settingsWordOnlyShow==1?   Flexible(
-                                  child: grid.imagepath!=null?Image.asset(grid.imagepath!,height: context.height*0.5,width: 100,):Container(),
+                                  child: grid.imagepath!=null? grid.imagepath!.contains("assets")?
+                                  Image.asset(grid.imagepath!,height: context.height*0.5,width: 100,): Image.file(File(grid.imagepath!),height: context.height*0.5,width: 100,):Container(),
 
                                 ):Container(),
                               ],
@@ -414,7 +432,7 @@ class GridViewWidget extends StatelessWidget {
                       builder: (context) =>
                        GestureDetector(
                         onTap: () {
-                          value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy);
+                          value.setItemOnEditState(index,context,title: grid.title??"",picture:grid.imagepath??"",id:  value.gridSizedModel.id??-1, videoPath: grid.videosPath??[]);
 
                         },
                         child: Container(
@@ -516,6 +534,7 @@ class NormalNavBar extends StatelessWidget {
                             onTap: () {
                               value.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
                               value.setGridSizedModel(contentProvider.allGridSizedModel[index]);
+
                               int count=contentProvider.allGridSizedModel[index].duplicateCount+1;
 
 
@@ -559,10 +578,8 @@ class NormalNavBar extends StatelessWidget {
                 GestureDetector(
                   onTap: (){
 
-
-                    // AppUtility.popOver(context,ListItems(content: [],count: 0,));
-              },
-                  child: Text("WordToob: First 25 Words",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    },
+                  child: Text(value.gridSizedModel.title??"",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: fontSize
                   )),

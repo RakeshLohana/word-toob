@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/app_providers/main_dashboard_controller.dart';
 import 'package:word_toob/common/app_constants/assets.dart';
 import 'package:word_toob/common/app_constants/route_strings.dart';
@@ -20,7 +21,9 @@ import 'package:word_toob/views/widgets/video_widget.dart';
 class EditPopOver extends StatefulWidget {
   final String title;
   final String picture;
-  const EditPopOver({super.key, required this.title, required this.picture});
+  final int id;
+  final int index;
+  const EditPopOver({super.key, required this.title, required this.picture, required this.id, required this.index});
 
   @override
   State<EditPopOver> createState() => _EditPopOverState();
@@ -41,8 +44,8 @@ class _EditPopOverState extends State<EditPopOver> {
   Widget build(BuildContext context) {
     double fontSize=context.height*0.02;
 
-    return Consumer<MainDashboardController>(
-      builder: (context, mainDashboardController, child) =>
+    return Consumer2<MainDashboardController,ContentProvider>(
+      builder: (context, mainDashboardController, contentProvider,child) =>
        Stack(
         children: [
           SingleChildScrollView(
@@ -69,7 +72,7 @@ class _EditPopOverState extends State<EditPopOver> {
 
                           Gap(10),
 
-                       mainDashboardController.isEditPressed?           SizedBox(
+                       mainDashboardController.isEditPressed?SizedBox(
                          width: context.width*0.1,
                          child: TextFormField(
                            onTapOutside: (e){FocusManager.instance.primaryFocus?.unfocus();},
@@ -99,9 +102,7 @@ class _EditPopOverState extends State<EditPopOver> {
                             onTap: () {
                               mainDashboardController.toggleBottomSheet();
                             },
-                            child: mainDashboardController.imagePath=="" ?CachedNetworkImage(
-                              height: 60,
-                              imageUrl: widget.picture,):Image.file(File(mainDashboardController.imagePath),height: 80,width: 80,),
+                            child: mainDashboardController.imagePath==""? widget.picture.contains("asset")? Image.asset(widget.picture  ,height: 80,width: 80,):Image.file(File(widget.picture,),height: 80,width: 80,):Image.file(File(mainDashboardController.imagePath),height: 80,width: 80,),
             
                           ),
                           Gap(10),
@@ -205,7 +206,6 @@ class _EditPopOverState extends State<EditPopOver> {
 
 
           if (mainDashboardController.showBottomSheet)
-
             GestureDetector(
               onTap: () {
                 mainDashboardController.toggleBottomSheetOff();
@@ -222,7 +222,13 @@ class _EditPopOverState extends State<EditPopOver> {
               bottom: 0,
               left: 0,
               right: 0,
-              child: CustomBottomSheet(controller: mainDashboardController,),
+              child: CustomBottomSheet(
+                controller: mainDashboardController,
+                id:widget.id,
+                contentProvider: contentProvider,
+                index: widget.index,
+
+              ),
             ),
         ],
       ),

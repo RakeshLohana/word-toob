@@ -26,8 +26,11 @@ class CustomBottomSheetVideo extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 GestureDetector(
-                  onTap: () {
-                    AppUtility.videoFromCamera();
+                  onTap: ()async {
+                   var video= await  AppUtility.videoFromCamera();
+
+                    controller.addVideoToList(video!.path);
+                    controller.toggleBottomSheetOffVideo();
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 6),
