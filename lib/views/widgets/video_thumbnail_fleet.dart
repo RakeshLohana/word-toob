@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -6,6 +8,7 @@ import 'package:get/get_utils/get_utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:word_toob/common/app_constants/assets.dart';
 import 'package:word_toob/common/app_constants/general.dart';
 import 'package:word_toob/views/theme/app_color.dart';
 
@@ -104,7 +107,7 @@ class VideoUploadWidget extends StatefulWidget {
 }
 
 class _VideoUploadWidgetState extends State<VideoUploadWidget> {
-  String? generatedFile;
+  Uint8List? generatedFile;
   bool isLoading = true;
   setLoading(bool loading){
     setState(() {
@@ -112,32 +115,63 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
     });
   }
 
- Future generateThumbnail() async {
-    Directory dir = await getApplicationCacheDirectory();
-    String? fileName="";
-    fileName = await VideoThumbnail.thumbnailFile(
-        video: widget.video,
-        thumbnailPath: dir.path,
-        imageFormat: ImageFormat.PNG,
-        maxHeight: 20,
-        // maxWidth: 80,
-        quality: 100,
-      );
 
+  Future<void> _generateThumbnail(File file) async {
+    final directory = await getApplicationDocumentsDirectory();
+    try {
+      print('exists ${file.existsSync()}');
 
-    printLog(fileName);
-    if(fileName != null){
-      setState(() {
-        generatedFile = fileName;
-      });
+      print('tempPath ${directory.path}');
+     var imageData = await VideoThumbnail.thumbnailData(
+       video: file.path,
+       imageFormat: ImageFormat.PNG,
+       maxWidth: 256,
+       maxHeight: 256,
+       quality: 50,
+     );
+
+         printLog(imageData);
+         if(imageData != null){
+           setState(() {
+             generatedFile =imageData;
+
+           });
+         }
+    } catch (e) {
+      print(e);
+      // eventBus.fire(showToast(CommonUtils.getLocale(null).noThumbnail));
+      return null;
     }
-    printLog(generatedFile);
-    setLoading(false);
+
   }
+
+
+  // Future generateThumbnail() async {
+ //    Directory dir = await getApplicationCacheDirectory();
+ //     var fileName = await VideoThumbnail.thumbnailData(
+ //      video: widget.video,
+ //      // thumbnailPath: (await getTemporaryDirectory()).path, /// path_provider
+ //      imageFormat: ImageFormat.PNG,
+ //      maxHeight: 50,
+ //      quality: 50,
+ //    );
+ //
+ //
+ //    printLog(fileName);
+ //    if(fileName != null){
+ //      setState(() {
+ //        String decodedString = utf8.decode(fileName);
+ //        generatedFile =decodedString;
+ //
+ //      });
+ //    }
+ //    printLog(generatedFile);
+ //    setLoading(false);
+ //  }
 
   @override
   void initState() {
-   Future.microtask(()=> generateThumbnail());
+   // Future.microtask(()=> _generateThumbnail(File(widget.video)));
     super.initState();
   }
 
@@ -186,17 +220,17 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
                     border: Border.all(color: AppColor.borderColor3.withOpacity(0.7)),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: isLoading ? Center(
-                    child: const Padding(
-                      padding: EdgeInsets.all(25.0),
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ) :
+                  child:
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.file(
-                      File(generatedFile!),
-                      fit: BoxFit.cover,
+                    child: Stack(
+                      children: [
+                        Container(color: Colors.black,),
+
+
+                        Positioned.fill(
+                            child: Icon(Icons.play_circle,size: 30,))
+                      ],
                     ),
                   ),
                 ),

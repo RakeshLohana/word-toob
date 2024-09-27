@@ -863,35 +863,46 @@ abstract class AppUtility {
                     Expanded(
                       child: ListView(
 
-                        children: list
-                            .map((item) => GestureDetector(
-                            onTap: (){
-                       GridSizeModel model=       GridSizeModel(gridSizeX: item.gridSizeX, hideModel: false,
-                           title: item.title,
-                           gridSizeY: item.gridSizeY,listData: List.generate(item.listData?.length??0, (index) => GridModel(),));
-                              value.setGridSize(item.gridSizeX??1, item.gridSizeY??2);
-                              value.setGridSizedModel(model);
-                              contentProvider.saveGridSizedModel(gridSizedModel:model );
+                        children: list.asMap().entries.map((entry) {
+                          int index = entry.key;  // The index
+                          var item = entry.value; // The item
 
+                          return GestureDetector(
+                            onTap: () {
+                              // Create a new GridSizeModel object
+                              GridSizeModel model = GridSizeModel(
+                                gridSizeX: item.gridSizeX,
+                                hideModel: false,
+                                title: item.title,
+                                gridSizeY: item.gridSizeY,
+                                listData: List.generate(item.listData?.length ?? 0, (i) => GridModel()),
+                              );
+
+                              // Perform actions using the value and model
+                              value.setGridSize(item.gridSizeX ?? 1, item.gridSizeY ?? 2);
+                              value.setGridSizedModel(model,index);
+                              contentProvider.saveGridSizedModel(gridSizedModel: model);
+
+                              // Close the dialog or screen
                               Navigator.pop(context);
-
                             },
-                              child: Center(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 8),
-                                                  width: double.infinity,
-                                                  child: Text(
-                                                    textAlign: TextAlign.left,
-                                                    item.title??"",  style: Theme.of(context).textTheme.bodySmall
-                                                      ?.copyWith(
-                                                    color: AppColor.appPrimaryColor,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),) ,
-
-                                                ),
+                            child: Center(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                width: double.infinity,
+                                child: Text(
+                                  textAlign: TextAlign.left,
+                                  item.title ?? "",
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColor.appPrimaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ))
-                            .toList(),
+                            ),
+                          );
+                        }).toList(),
+
                       ),
                     ),
                   ],

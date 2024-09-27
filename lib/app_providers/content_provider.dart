@@ -132,6 +132,8 @@ class ContentProvider extends ChangeNotifier{
 
       );
       notifyListeners();
+      _allGridSizedModel=await iAppRepository.getAllGridSizedModel();
+      notifyListeners();
       updateGridListDataStatus = Status.loaded;
     }on Exception catch (e){
       updateGridListDataStatus = Status.error;
@@ -147,7 +149,8 @@ class ContentProvider extends ChangeNotifier{
     notifyListeners();
     try{
       await getAllGridSizeModel();
-       if(contenProvider.allGridSizedModel.isEmpty) await iAppRepository.saveAllGridSizedModel(gridSizedModelList: gridSizedModelList);
+       if(contenProvider.allGridSizedModel.isEmpty)
+         await iAppRepository.saveAllGridSizedModel(gridSizedModelList: gridSizedModelList);
       await getAllGridSizeModel();
       notifyListeners();
       saveAllGridSizeModelStatus = Status.loaded;

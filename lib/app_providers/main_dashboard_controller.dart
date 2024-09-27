@@ -10,6 +10,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:popover/popover.dart';
 import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/common/app_constants/assets.dart';
+import 'package:word_toob/common/app_constants/general.dart';
 import 'package:word_toob/common/utils/app_utility.dart';
 import 'package:word_toob/source/models/grid_model.dart';
 import 'package:word_toob/source/models/grid_size_model.dart';
@@ -50,9 +51,16 @@ class MainDashboardController extends ChangeNotifier{
   int _settingsWordOnlyShow=1 ;
   int get settingsWordOnlyShow  => _settingsWordOnlyShow;
 
+  int _gridIndex=0 ;
+  int get gridIndex  => _gridIndex;
+
 
   bool _useSpeech=true ;
   bool get useSpeech  => _useSpeech;
+
+
+  bool _lottie=false ;
+  bool get lottie  => _lottie;
 
 
   List<String> _videos=[];
@@ -102,6 +110,7 @@ class MainDashboardController extends ChangeNotifier{
           _voices =
               voices.where((voice) => voice["name"].contains("en")).toList();
           _currentVoice = _voices.first;
+
           setVoice(_currentVoice!);
           notifyListeners();
       } catch (e) {
@@ -115,9 +124,24 @@ class MainDashboardController extends ChangeNotifier{
   }
 
 
-  setGridSizedModel(GridSizeModel grid){
+  setGridSizedModel(GridSizeModel grid,int index){
     _gridSizedModel=grid;
+    _gridIndex=index;
     notifyListeners();
+  }
+
+  setLottie(){
+    _lottie=true;
+    printLog(_currentWordStart);
+    Future.delayed(Duration(seconds: 2),(){
+      _lottie=false;
+      notifyListeners();
+
+
+    });
+
+    notifyListeners();
+
   }
 
   Future<void>getCurrentSelectedGridSizedModel( ContentProvider contentProvider) async{
@@ -167,6 +191,7 @@ class MainDashboardController extends ChangeNotifier{
 
    void addVideoToList(String videoPath){
      _videos.add(videoPath);
+
      notifyListeners();
    }
 
@@ -230,7 +255,10 @@ class MainDashboardController extends ChangeNotifier{
 
 
 
-  void setItemOnEditState(int index,BuildContext context,{required String title,required String picture,required int id,required List<String> videoPath }) {
+  void setItemOnEditState(int index,BuildContext context,{required String title,required String picture,required int id,
+    required bool hide,
+    required List<String> videoPath,
+    required int gridIndex }) {
 
     if (_editPressed) {
       _itemClickedOnEditState = index;
@@ -238,11 +266,12 @@ class MainDashboardController extends ChangeNotifier{
       _showBottomSheetVideo=false;
       _showBottomSheet=false;
       _isEditPressed=false;
-      AppUtility.popOver(context,EditPopOver(title: title, picture: picture,index: index,id: id,),
+      _imagePath='';
+      AppUtility.popOver(context,EditPopOver(title: title, picture: picture,index: index,id: id,gridIndex:gridIndex ,hide:hide ,),
 
           direct: PopoverDirection.top  ,heightSize: context.height*1.2,widthSize: context.width*0.9);
       _videos.clear();
-      _videos=videoPath;
+      _videos.addAll(videoPath);
       notifyListeners();
 
 

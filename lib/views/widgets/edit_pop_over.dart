@@ -23,7 +23,9 @@ class EditPopOver extends StatefulWidget {
   final String picture;
   final int id;
   final int index;
-  const EditPopOver({super.key, required this.title, required this.picture, required this.id, required this.index});
+  final int gridIndex;
+  final bool  hide;
+  const EditPopOver({super.key, required this.title, required this.picture, required this.id, required this.index, required this.gridIndex, required this.hide});
 
   @override
   State<EditPopOver> createState() => _EditPopOverState();
@@ -98,31 +100,49 @@ class _EditPopOverState extends State<EditPopOver> {
                           ),
             
                           Gap(10),
-                          GestureDetector(
+                           if(widget.picture!="")
+                             GestureDetector(
                             onTap: () {
                               mainDashboardController.toggleBottomSheet();
                             },
-                            child: mainDashboardController.imagePath==""? widget.picture.contains("asset")? Image.asset(widget.picture  ,height: 80,width: 80,):Image.file(File(widget.picture,),height: 80,width: 80,):Image.file(File(mainDashboardController.imagePath),height: 80,width: 80,),
+                            child: mainDashboardController.imagePath=="" ? widget.picture.contains("asset")? Image.asset(widget.picture  ,height: 80,width: 80,):Image.file(File(widget.picture,),height: 80,width: 80,):Image.file(File(mainDashboardController.imagePath),height: 80,width: 80,),
             
                           ),
                           Gap(10),
             
-                          Text("Edit Picture",
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColor.appPrimaryColor,
-                              fontWeight: FontWeight.bold,
-                                fontSize: fontSize
+                          GestureDetector(
+                            onTap: () {
 
+                              mainDashboardController.toggleBottomSheet();
+
+                            },
+                            child: Text("Edit Picture",
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColor.appPrimaryColor,
+                                fontWeight: FontWeight.bold,
+                                  fontSize: fontSize
+
+                              ),
                             ),
                           ),
                           Gap(10),
             
-                          Text("Hide Word",
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColor.appPrimaryColor,
-                              fontWeight: FontWeight.bold,
-                                fontSize: fontSize
+                          GestureDetector(
+                            onTap: () {
+                              contentProvider.updateListDataItem(id: widget.id, itemIndex: widget.index,hideTitle:!widget.hide);
+                              contentProvider.getAllGridSizeModel();
+                              mainDashboardController.setGridSizedModel(contentProvider.allGridSizedModel[mainDashboardController.gridIndex], mainDashboardController.gridIndex);
+                              setState(() {
 
+                              });
+                            },
+                            child: Text( widget.hide? "Hide Word":"Unhide word",
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColor.appPrimaryColor,
+                                fontWeight: FontWeight.bold,
+                                  fontSize: fontSize
+
+                              ),
                             ),
                           ),
             
@@ -201,7 +221,7 @@ class _EditPopOverState extends State<EditPopOver> {
               bottom: 0,
               left: 0,
               right: 0,
-              child: CustomBottomSheetVideo(controller: mainDashboardController,),
+              child: CustomBottomSheetVideo(controller: mainDashboardController,gridIndex: widget.gridIndex,id: widget.id,index: widget.index,),
             ),
 
 
@@ -223,6 +243,7 @@ class _EditPopOverState extends State<EditPopOver> {
               left: 0,
               right: 0,
               child: CustomBottomSheet(
+                gridIndex: widget.gridIndex,
                 controller: mainDashboardController,
                 id:widget.id,
                 contentProvider: contentProvider,

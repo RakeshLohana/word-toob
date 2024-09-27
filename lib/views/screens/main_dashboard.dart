@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
@@ -21,6 +22,7 @@ import 'package:word_toob/common/utils/app_utility.dart';
 import 'package:word_toob/dependency_inject.dart';
 import 'package:word_toob/source/models/grid_model.dart';
 import 'package:word_toob/views/theme/app_color.dart';
+import 'package:word_toob/views/widgets/bottom_sheet.dart';
 import 'package:word_toob/views/widgets/custom_menu_widget.dart';
 import 'package:word_toob/views/widgets/tool_tip_widget.dart';
 
@@ -378,8 +380,11 @@ class GridViewWidget extends StatelessWidget {
                      GestureDetector(
                       onTap: () {
                         // value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy );
-                        value.setItemOnEditState(index,context,title:grid.title??'' ,picture: grid.imagepath??MyAssets.happy,id: value.gridSizedModel.id??-1,videoPath: grid.videosPath??[] );
+                        value.setItemOnEditState(
+                          hide: grid.hidetitle??false,
+                            index,context,title:grid.title??'' ,picture: grid.imagepath??MyAssets.happy,id: value.gridSizedModel.id??-1,videoPath: grid.videosPath??[],gridIndex: value.gridIndex );
                         if(!value.editPressed){
+                          value.setLottie();
                           value.flutterTts.speak(  grid.title??"nothing");
                           if(grid.videosPath?.isNotEmpty??true   && grid.videosPath!.length>1){
                             var rand=Random().nextInt(grid.videosPath?.length??0+1);
@@ -432,7 +437,10 @@ class GridViewWidget extends StatelessWidget {
                       builder: (context) =>
                        GestureDetector(
                         onTap: () {
-                          value.setItemOnEditState(index,context,title: grid.title??"",picture:grid.imagepath??"",id:  value.gridSizedModel.id??-1, videoPath: grid.videosPath??[]);
+                          value.setItemOnEditState(
+                            hide: grid.hidetitle??false,
+                            gridIndex: value.gridIndex,
+                              index,context,title: grid.title??"",picture:grid.imagepath??"",id:  value.gridSizedModel.id??-1, videoPath: grid.videosPath??[]);
 
                         },
                         child: Container(
@@ -533,7 +541,7 @@ class NormalNavBar extends StatelessWidget {
                           return ListTile(
                             onTap: () {
                               value.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
-                              value.setGridSizedModel(contentProvider.allGridSizedModel[index]);
+                              value.setGridSizedModel(contentProvider.allGridSizedModel[index],value.gridIndex);
 
                               int count=contentProvider.allGridSizedModel[index].duplicateCount+1;
 
@@ -571,6 +579,9 @@ class NormalNavBar extends StatelessWidget {
                         IconButton(onPressed: () {
 
                         }, icon: Icon(Icons.mic,size: iconSize,)),
+                        Gap(sizeWidth),
+                      if(value.lottie) Lottie.asset('assets/v_player.json',animate: value.lottie, ),
+
                       ],
                                            ),
 
@@ -815,10 +826,18 @@ class NormalNavBar extends StatelessWidget {
                     //   )),
                     // ),
                     Gap(sizeWidth),
-                    Text("Help",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: fontSize
-                    )),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => BottomSheetContent(),
+                        );                      },
+                      child: Text("Help",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: fontSize
+                      )),
+                    ),
                   ],
                 )
               ],

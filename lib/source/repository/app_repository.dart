@@ -106,7 +106,9 @@ class AppRepository extends IAppRepository{
     final response = await localDataSource.
     updateGridSizedModelListDataItem(
         id: id,itemIndex: itemIndex,title: title,hideImage: hideImage,videosPath: videosPath,hideTitle: hideTitle,imagePath: imagePath
-    );
+    ).then((value) async{
+      await getAllGridSizedModel();
+    },);
     return response;
   }
 
