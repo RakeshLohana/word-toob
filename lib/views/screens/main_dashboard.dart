@@ -22,6 +22,8 @@ import 'package:word_toob/common/utils/app_utility.dart';
 import 'package:word_toob/dependency_inject.dart';
 import 'package:word_toob/source/models/grid_model.dart';
 import 'package:word_toob/views/theme/app_color.dart';
+import 'package:word_toob/views/widgets/Main%20Dashboard%20Widgets/main_dashboard_grid.dart';
+import 'package:word_toob/views/widgets/Main%20Dashboard%20Widgets/nav_bar.dart';
 import 'package:word_toob/views/widgets/bottom_sheet.dart';
 import 'package:word_toob/views/widgets/custom_menu_widget.dart';
 import 'package:word_toob/views/widgets/tool_tip_widget.dart';
@@ -320,6 +322,9 @@ class _MainDashboardState extends State<MainDashboard> {
        ];
 
 
+
+
+
     double sizeWidth=context.width*0.02;
 
     return SafeArea(
@@ -335,7 +340,7 @@ class _MainDashboardState extends State<MainDashboard> {
              child: Column(
                 children: [
               if(!mainDashBoarState.editPressed)
-                NormalNavBar(addMap: addMap, sizeWidth: sizeWidth,value: mainDashBoarState,contentProvider: contentState,)
+                NormalNavBar(addMap: addMap, sizeWidth: sizeWidth,value: mainDashBoarState,contentProvider: contentState,menuController: MenuController(),)
                 else
                   EditWidget(sizeWidth: sizeWidth, controler: _controler,value: mainDashBoarState,),
                   GridViewWidget(value:mainDashBoarState ,),
@@ -350,500 +355,473 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 }
 
-class GridViewWidget extends StatelessWidget {
-  final MainDashboardController value;
-  const GridViewWidget({
-    super.key, required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Flexible(
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: value.gridSizedModel.hideModel==false? Center(
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: BouncingScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-               crossAxisCount:  value.gridSizedModel.gridSizeY??2,
-              childAspectRatio: 1,
-            ),
-            itemCount: value.gridSizedModel.listData?.length,
-            itemBuilder: (context, index) {
-              final GridModel grid=value.gridSizedModel.listData?[index]??GridModel();
-              return Stack(
-                children: [
-                  Builder(
-                    builder: (context) =>
-                     GestureDetector(
-                      onTap: () {
-                        // value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy );
-                        value.setItemOnEditState(
-                          hide: grid.hidetitle??false,
-                            index,context,title:grid.title??'' ,picture: grid.imagepath??MyAssets.happy,id: value.gridSizedModel.id??-1,videoPath: grid.videosPath??[],gridIndex: value.gridIndex );
-                        if(!value.editPressed){
-                          value.setLottie();
-                          value.flutterTts.speak(  grid.title??"nothing");
-                          if(grid.videosPath?.isNotEmpty??true   && grid.videosPath!.length>1){
-                            var rand=Random().nextInt(grid.videosPath?.length??0+1);
-                            Navigator.pushNamed(context, RouteStrings.videoPlayer,arguments: grid.videosPath?[rand]);
-                          }
-
-                        }
 
 
 
-
-                      },
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: AppColor.cardColor,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding:  EdgeInsets.symmetric(vertical:context.height*0.02,horizontal: context.width*0.02),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  grid.title??'?',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColor.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: context.height*0.028, // Adjust the font size if necessary
-                                  ),
-                                ),
-                                SizedBox(height: context.height*0.02), // Add spacing between text and image
-                             value.settingsWordOnlyShow==1?   Flexible(
-                                  child: grid.imagepath!=null? grid.imagepath!.contains("assets")?
-                                  Image.asset(grid.imagepath!,height: context.height*0.5,width: 100,): Image.file(File(grid.imagepath!),height: context.height*0.5,width: 100,):Container(),
-
-                                ):Container(),
-                              ],
-                            ),
-                          ),
-                        )
-
-                      ),
-                    ),
-                  ),
-                  if (value.itemClickeBool && value.itemClickedOnEditState != index)
-                    Builder(
-                      builder: (context) =>
-                       GestureDetector(
-                        onTap: () {
-                          value.setItemOnEditState(
-                            hide: grid.hidetitle??false,
-                            gridIndex: value.gridIndex,
-                              index,context,title: grid.title??"",picture:grid.imagepath??"",id:  value.gridSizedModel.id??-1, videoPath: grid.videosPath??[]);
-
-                        },
-                        child: Container(
-                          color: AppColor.lightBlue.withOpacity(0.5), // Light blue overlay with opacity
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-        ):Container(),
-      ),
-    );
-
-  }
-}
-
-class NormalNavBar extends StatelessWidget {
-  final MainDashboardController value;
-  final ContentProvider contentProvider;
-   NormalNavBar({
+class LeftButton extends StatelessWidget {
+  const LeftButton({
     super.key,
     required this.addMap,
-    required this.sizeWidth, required this.value, required this.contentProvider,
+    required this.iconSize,
+    required this.sizeWidth,
+    required this.menuController,
+    required this.contentProvider,
+    required this.value,
+    required this.fontSize,
   });
 
   final List<Map<String, dynamic>> addMap;
+  final double iconSize;
   final double sizeWidth;
-  MenuController menuController=MenuController();
+  final MenuController menuController;
+  final ContentProvider contentProvider;
+  final MainDashboardController value;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
-    double fontSize=context.height*0.025;
-    double iconSize=context.height*0.04;
-    double gap=15;
+    return Row(
+    children: [
+
+      PlusButton(addMap: addMap, iconSize: iconSize),
+
+      Gap(sizeWidth),
+      MyBoardsButton(menuController: menuController, contentProvider: contentProvider, value: value, fontSize: fontSize),
 
 
-    return Container(
-      height: context.height*0.12,
+      Gap(sizeWidth),
 
-          color: AppColor.white,
-          padding: EdgeInsets.symmetric(horizontal:10,vertical:0),
-          child:
-             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+      IconButton(onPressed: () {
+
+      }, icon: Icon(Icons.mic,size: iconSize,)),
+      Gap(sizeWidth),
+      if(value.lottie) Lottie.asset('assets/v_player.json',animate: value.lottie, ),
+
+    ],
+                         );
+  }
+}
+
+class CenterTitle extends StatelessWidget {
+  const CenterTitle({
+    super.key,
+    required this.value,
+    required this.fontSize,
+  });
+
+  final MainDashboardController value;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+
+        },
+      child: Text(value.gridSizedModel.title??"",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: fontSize
+      )),
+    );
+  }
+}
+
+class PlusButton extends StatelessWidget {
+  const PlusButton({
+    super.key,
+    required this.addMap,
+    required this.iconSize,
+  });
+
+  final List<Map<String, dynamic>> addMap;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomMenuAnchor(
+        menuItems:List.generate(addMap.length,(index)=> GestureDetector(
+          onTap: addMap[index]["onTap"],
+          child: ListTile(
+            tileColor:index==0? AppColor.shadowColor:AppColor.white,
+            title: Text(addMap[index]["name"],
+
+                    style: Theme.of(context).textTheme.bodyLarge
+                        ?.copyWith(
+                      color: AppColor.blue,
+
+                      fontWeight: FontWeight.bold,
+                    ),),
+          ),
+
+        ))
+
+        , titleWidget:Icon(Icons.add,size: iconSize,) );
+  }
+}
+
+class MyBoardsButton extends StatelessWidget {
+  const MyBoardsButton({
+    super.key,
+    required this.menuController,
+    required this.contentProvider,
+    required this.value,
+    required this.fontSize,
+  });
+
+  final MenuController menuController;
+  final ContentProvider contentProvider;
+  final MainDashboardController value;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomMenuAnchor(
+      menuController:menuController,
+
+
+      menuItems:
+    List.generate(contentProvider.allGridSizedModel.length, (index){
+
+      return ListTile(
+        onTap: () {
+          value.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
+          value.setGridSizedModel(contentProvider.allGridSizedModel[index],value.gridIndex);
+
+          int count=contentProvider.allGridSizedModel[index].duplicateCount+1;
+
+
+          GridSizeModel gridSizeModel=GridSizeModel(
+            currentSelected: true,
+            duplicateCount: count,
+            listData: contentProvider.allGridSizedModel[index].listData,
+            gridSizeY: contentProvider.allGridSizedModel[index].gridSizeY,
+
+
+            gridSizeX: contentProvider.allGridSizedModel[index].gridSizeX,
+            title: "${contentProvider.allGridSizedModel[index].title} copy ${count} ",
+
+          );
+          count=0;
+
+          value.makeDuplicateGridSizedModel(gridSizeModel);
+          menuController.close();
+
+        },
+        visualDensity: VisualDensity(horizontal: -4,vertical: -4),
+        title: Text(contentProvider.allGridSizedModel[index].title??""),
+
+      );
+                                          }
+    )
+      , titleWidget: Text("My Boards",style: Theme.of(context).textTheme.bodySmall
+     ?.copyWith(
+               fontSize:fontSize , fontWeight: FontWeight.bold,),),);
+  }
+}
+
+class RightRow extends StatelessWidget {
+  const RightRow({
+    super.key,
+    required this.menuController,
+    required this.gameMap,
+    required this.fontSize,
+    required this.sizeWidth,
+    required this.value,
+    required this.gap,
+  });
+
+  final MenuController menuController;
+  final List<Map<String, dynamic>> gameMap;
+  final double fontSize;
+  final double sizeWidth;
+  final MainDashboardController value;
+  final double gap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+
+        CustomMenuAnchor(
+
+          menuController:menuController,
+
+
+          menuItems:
+          List.generate(2, (index){
+
+            return ListTile(
+              onTap:gameMap[index]["onTap"],
+              visualDensity: VisualDensity(horizontal: -4,vertical: -4),
+              title: Text(gameMap[index]["name"]),
+
+            );
+          }
+          )
+          , titleWidget: Text("Games",style: Theme.of(context).textTheme.bodySmall
+            ?.copyWith(
+          fontSize:fontSize ,
+          fontWeight: FontWeight.bold,),),),
 
 
 
 
-                      Row(
+        Gap(sizeWidth),
+        GestureDetector(
+          onTap: () {
+            value.setEdit(true);
+          },
+          child: Text("Edit",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: fontSize,
+          )),
+        ),
+        Gap(sizeWidth),
+
+        SettingButton(fontSize: fontSize, gap: gap, value: value),
+
+
+        Gap(sizeWidth),
+        HelpButton(fontSize: fontSize),
+      ],
+    );
+  }
+}
+
+class HelpButton extends StatelessWidget {
+  const HelpButton({
+    super.key,
+    required this.fontSize,
+  });
+
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => BottomSheetContent(),
+        );                      },
+      child: Text("Help",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: fontSize
+      )),
+    );
+  }
+}
+
+class SettingButton extends StatelessWidget {
+  const SettingButton({
+    super.key,
+    required this.fontSize,
+    required this.gap,
+    required this.value,
+  });
+
+  final double fontSize;
+  final double gap;
+  final MainDashboardController value;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomMenuAnchor(menuItems: [
+      CustomMenuItemButton(child:        Container(
+        width: context.width*0.73,
+        padding: EdgeInsets.symmetric(horizontal: 5),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+
+            children: [
+              Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontSize: 20,
+                  color: AppColor.appPrimaryColor
+              ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  Gap(25),
+                  Text("Tiles",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: fontSize+8,
+                      color:AppColor.appPrimaryColor.withOpacity(0.5)
+                  )),
+                  Gap(gap),
+
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Column(
                       children: [
+                       GestureDetector(
+                         onTap: () {
+                           value.wordsOnlyShowSettings(1);
+                         },
+                         child: Row(
+                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                           children: [
+                             Text("Symbols & Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                 fontSize: fontSize+10,
+                                 color:AppColor.appPrimaryColor
+                             )) ,
+                           value.settingsWordOnlyShow==1?  Icon(Icons.check,color: AppColor.green,):Container()
+                           ],
+                         ),
+                       ),
+                        Gap(gap),
+                       GestureDetector(
+                         onTap: () {
+                           value.wordsOnlyShowSettings(2);
+                         },
+                         child: Row(
+                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                        CustomMenuAnchor(
-                            menuItems:List.generate(addMap.length,(index)=> GestureDetector(
-                              onTap: addMap[index]["onTap"],
-                              child: ListTile(
-                                tileColor:index==0? AppColor.shadowColor:AppColor.white,
-                                title: Text(addMap[index]["name"],
+                           children: [
+                             Text("Word Only",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                 fontSize: fontSize+10,
+                                 color:AppColor.appPrimaryColor
+                             )) ,
+                           value.settingsWordOnlyShow==2?  Icon(Icons.check,color: AppColor.green,):Container()
 
-                                        style: Theme.of(context).textTheme.bodyLarge
-                                            ?.copyWith(
-                                          color: AppColor.blue,
-
-                                          fontWeight: FontWeight.bold,
-                                        ),),
-                              ),
-                              // child: Container(
-                              //   color: index==0? AppColor.shadowColor:AppColor.white,
-                              //   width: double.infinity,
-                              //   padding: EdgeInsets.all(10),
-                              //   margin: EdgeInsets.symmetric(vertical: 1),
-                              //   child: Center(
-                              //     child: Text(addMap[index]["name"],
-                              //
-                              //       style: Theme.of(context).textTheme.bodySmall
-                              //           ?.copyWith(
-                              //         color: AppColor.blue,
-                              //
-                              //         fontWeight: FontWeight.bold,
-                              //       ),),
-                              //   ),
-                              //
-                              // ),
-                            ))
-
-                            , titleWidget:Icon(Icons.add,size: iconSize,) ),
-
-                        Gap(sizeWidth),
-                        CustomMenuAnchor(
-                          menuController:menuController,
+                           ],
+                         ),
+                       ),
 
 
-                          menuItems:
-                        List.generate(contentProvider.allGridSizedModel.length, (index){
-
-                          return ListTile(
-                            onTap: () {
-                              value.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
-                              value.setGridSizedModel(contentProvider.allGridSizedModel[index],value.gridIndex);
-
-                              int count=contentProvider.allGridSizedModel[index].duplicateCount+1;
-
-
-                              GridSizeModel gridSizeModel=GridSizeModel(
-                                currentSelected: true,
-                                duplicateCount: count,
-                                listData: contentProvider.allGridSizedModel[index].listData,
-                                gridSizeY: contentProvider.allGridSizedModel[index].gridSizeY,
-
-
-                                gridSizeX: contentProvider.allGridSizedModel[index].gridSizeX,
-                                title: "${contentProvider.allGridSizedModel[index].title} copy ${count} ",
-
-                              );
-                              count=0;
-
-                              value.makeDuplicateGridSizedModel(gridSizeModel);
-                              menuController.close();
-
-                            },
-                            visualDensity: VisualDensity(horizontal: -4,vertical: -4),
-                            title: Text(contentProvider.allGridSizedModel[index].title??""),
-
-                          );
-                                                              }
-                        )
-                          , titleWidget: Text("My Boards",style: Theme.of(context).textTheme.bodySmall
-                         ?.copyWith(
-                                   fontSize:fontSize , fontWeight: FontWeight.bold,),),),
-
-
-                        Gap(sizeWidth),
-
-                        IconButton(onPressed: () {
-
-                        }, icon: Icon(Icons.mic,size: iconSize,)),
-                        Gap(sizeWidth),
-                      if(value.lottie) Lottie.asset('assets/v_player.json',animate: value.lottie, ),
 
                       ],
-                                           ),
+                    ),
+                  ),
+                  Gap(gap),
 
 
-                GestureDetector(
-                  onTap: (){
-
-                    },
-                  child: Text(value.gridSizedModel.title??"",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSize
+                  Text("SPEECH OUTPUT",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: fontSize+5,
+                      color:AppColor.appPrimaryColor.withOpacity(0.5)
                   )),
-                ),
+                  Gap(gap),
 
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        contentProvider.getAllGridSizeModel();
-                      },
-                      child: Text("Games",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: fontSize
-                      )),
-                    ),
-                    Gap(sizeWidth),
-                    GestureDetector(
-                      onTap: () {
-                        value.setEdit(true);
-                      },
-                      child: Text("Edit",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: fontSize,
-                      )),
-                    ),
-                    Gap(sizeWidth),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Use Speech",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: fontSize+10,
+                                color:AppColor.appPrimaryColor
+                            )) ,
+                            Switch(
+                              activeColor: AppColor.white,
+                                activeTrackColor: AppColor.green,
+                                value: value.useSpeech, onChanged: (valueNew){
+                                value.useSpeechFunction();
 
-                    CustomMenuAnchor(menuItems: [
-                      CustomMenuItemButton(child:        Container(
-                        width: context.width*0.73,
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-
-                            children: [
-                              Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 20,
-                                  color: AppColor.appPrimaryColor
-                              ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  Gap(25),
-                                  Text("Tiles",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: fontSize+8,
-                                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                                  )),
-                                  Gap(gap),
-
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 5),
-                                    child: Column(
-                                      children: [
-                                       GestureDetector(
-                                         onTap: () {
-                                           value.wordsOnlyShowSettings(1);
-                                         },
-                                         child: Row(
-                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                           children: [
-                                             Text("Symbols & Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                 fontSize: fontSize+10,
-                                                 color:AppColor.appPrimaryColor
-                                             )) ,
-                                           value.settingsWordOnlyShow==1?  Icon(Icons.check,color: AppColor.green,):Container()
-                                           ],
-                                         ),
-                                       ),
-                                        Gap(gap),
-                                       GestureDetector(
-                                         onTap: () {
-                                           value.wordsOnlyShowSettings(2);
-                                         },
-                                         child: Row(
-                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                           children: [
-                                             Text("Word Only",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                 fontSize: fontSize+10,
-                                                 color:AppColor.appPrimaryColor
-                                             )) ,
-                                           value.settingsWordOnlyShow==2?  Icon(Icons.check,color: AppColor.green,):Container()
-
-                                           ],
-                                         ),
-                                       ),
-
-
-
-                                      ],
-                                    ),
-                                  ),
-                                  Gap(gap),
-
-
-                                  Text("SPEECH OUTPUT",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: fontSize+5,
-                                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                                  )),
-                                  Gap(gap),
-
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 5),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text("Use Speech",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                fontSize: fontSize+10,
-                                                color:AppColor.appPrimaryColor
-                                            )) ,
-                                            Switch(
-                                              activeColor: AppColor.white,
-                                                activeTrackColor: AppColor.green,
-                                                value: value.useSpeech, onChanged: (valueNew){
-                                                value.useSpeechFunction();
-
-                                            })
-                                          ],
-                                        ),
-                                        Gap(10),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                          children: [
-                                            Text("Voice",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                fontSize: fontSize+10,
-                                                color:AppColor.appPrimaryColor
-                                            )),
-                                            Text("English (United States)",
-                                                maxLines: 2,
-                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                fontSize: fontSize+5,
-                                            
-                                                color:AppColor.appPrimaryColor
-                                            )) ,
-
-
-                                          ],
-                                        ),
-
-
-
-
-
-
-                                      ],
-                                    ),
-                                  ),
-                                  Gap(gap),
-
-                                  Text("SPEECH RECOGNITION",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: fontSize+5,
-                                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                                  )),
-                                  Gap(gap),
-
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 5),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text("English ",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                fontSize: fontSize+10,
-                                                color:AppColor.appPrimaryColor
-                                            )) ,
-                                            Icon(Icons.check,color: AppColor.green,)
-                                          ],
-                                        ),
-                                        Gap(gap),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                          children: [
-                                            Text("Spanish",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                fontSize: fontSize+10,
-                                                color:AppColor.appPrimaryColor
-                                            )) ,
-                                            Icon(Icons.check,color: AppColor.green,)
-
-                                          ],
-                                        ),
-
-
-
-                                      ],
-                                    ),
-                                  ),
-                                  Gap(gap),
-
-
-                                  Text("GAME OPTIONS",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: fontSize+8,
-                                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                                  )),
-                                  Gap(gap),
-
-
-                                  Text("Find The Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: fontSize+10,
-                                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                                  )),
-
-
-
-                                ],
-                              ),
-                            ],
-                          ),
+                            })
+                          ],
                         ),
-                      ),)
-                    ], titleWidget:  Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: fontSize
-                    )),
-                    ),
+                        Gap(10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                    // GestureDetector(
-                    //   onTap: () {
-                    //
-                    //
-                    //   },
-                    //   child: Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    //     fontWeight: FontWeight.bold,
-                    //     fontSize: fontSize
-                    //   )),
-                    // ),
-                    Gap(sizeWidth),
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) => BottomSheetContent(),
-                        );                      },
-                      child: Text("Help",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: fontSize
-                      )),
-                    ),
-                  ],
-                )
-              ],
-                               ),
+                          children: [
+                            Text("Voice",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: fontSize+10,
+                                color:AppColor.appPrimaryColor
+                            )),
+                            Text("English (United States)",
+                                maxLines: 2,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: fontSize+5,
 
-        );
+                                color:AppColor.appPrimaryColor
+                            )) ,
+
+
+                          ],
+                        ),
+
+
+
+
+
+
+                      ],
+                    ),
+                  ),
+                  Gap(gap),
+
+                  Text("SPEECH RECOGNITION",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: fontSize+5,
+                      color:AppColor.appPrimaryColor.withOpacity(0.5)
+                  )),
+                  Gap(gap),
+
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("English ",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: fontSize+10,
+                                color:AppColor.appPrimaryColor
+                            )) ,
+                            Icon(Icons.check,color: AppColor.green,)
+                          ],
+                        ),
+                        Gap(gap),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                            Text("Spanish",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: fontSize+10,
+                                color:AppColor.appPrimaryColor
+                            )) ,
+                            Icon(Icons.check,color: AppColor.green,)
+
+                          ],
+                        ),
+
+
+
+                      ],
+                    ),
+                  ),
+                  Gap(gap),
+
+
+                  Text("GAME OPTIONS",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: fontSize+8,
+                      color:AppColor.appPrimaryColor.withOpacity(0.5)
+                  )),
+                  Gap(gap),
+
+
+                  Text("Find The Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: fontSize+10,
+                      color:AppColor.appPrimaryColor.withOpacity(0.5)
+                  )),
+
+
+
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),)
+    ], titleWidget:  Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: fontSize
+    )),
+    );
   }
 }
 

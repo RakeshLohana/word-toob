@@ -4,6 +4,7 @@ import 'package:word_toob/views/theme/app_color.dart';
 class CustomMenuAnchor extends StatelessWidget {
   final List<Widget> menuItems;
   final Widget titleWidget;
+  final Color backgroundColor;
   final MenuController? menuController;
 
 
@@ -11,16 +12,20 @@ class CustomMenuAnchor extends StatelessWidget {
     Key? key,
 
     required this.menuItems,
-    required this.titleWidget,  this.menuController,
+    required this.titleWidget,  this.menuController,  this.backgroundColor=AppColor.white,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
+
+
       controller: menuController,
 
       style: MenuStyle(
-        backgroundColor: WidgetStateProperty.all(AppColor.white)
+
+
+        backgroundColor: WidgetStateProperty.all(backgroundColor)
       ),
       builder: (context, controller, child) => GestureDetector(
         onTap: () {
@@ -54,6 +59,7 @@ class CustomMenuItemButton extends StatelessWidget {
 
 
       style: ButtonStyle(
+        textStyle: WidgetStateProperty.resolveWith((states) => TextStyle(color: Colors.white),),
 
         padding:WidgetStateProperty.all(EdgeInsetsDirectional.all(10)),
         backgroundColor: WidgetStateProperty.all<Color>(Colors.white),

@@ -62,6 +62,9 @@ class MainDashboardController extends ChangeNotifier{
   bool _lottie=false ;
   bool get lottie  => _lottie;
 
+  bool _findTheWord =false;
+  bool get findTheWord=>_findTheWord;
+
 
   List<String> _videos=[];
   List<String> get videos=>_videos;
@@ -283,6 +286,12 @@ class MainDashboardController extends ChangeNotifier{
 
   void isEditPressedFun() {
      _isEditPressed=!_isEditPressed;
+    notifyListeners();
+  }
+
+
+  void setFindTheWord(bool value) {
+     _findTheWord=value;
     notifyListeners();
   }
 
