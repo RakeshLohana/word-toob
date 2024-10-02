@@ -38,6 +38,7 @@ class NormalNavBar extends StatelessWidget {
 
   final List<Map<String, dynamic>> addMap;
   final double sizeWidth;
+  final MenuController menuController2=MenuController();
 
 
   @override
@@ -57,6 +58,7 @@ class NormalNavBar extends StatelessWidget {
         "onTap":(){
           menuController.close();
           value.setFindTheWord(true);
+          value.setRandomIndex();
         }
       }
 
@@ -65,7 +67,6 @@ class NormalNavBar extends StatelessWidget {
     double fontSize=context.height*0.025;
     double iconSize=context.height*0.04;
     double gap=15;
-
 
     return Container(
       height: context.height*0.12,
@@ -79,7 +80,9 @@ class NormalNavBar extends StatelessWidget {
 
 
 
-          LeftButton(addMap: addMap, iconSize: iconSize, sizeWidth: sizeWidth, menuController: menuController, contentProvider: contentProvider, value: value, fontSize: fontSize),
+          LeftRow(addMap: addMap,
+              menuController2: menuController2,
+              iconSize: iconSize, sizeWidth: sizeWidth, contentProvider: contentProvider, value: value, fontSize: fontSize),
 
 
           CenterTitle(value: value, fontSize: fontSize),
@@ -88,21 +91,63 @@ class NormalNavBar extends StatelessWidget {
           if(!value.findTheWord)
             RightRow(menuController: menuController, gameMap: gameMap, fontSize: fontSize, sizeWidth: sizeWidth, value: value, gap: gap)
           else
-            Row(
-              children: [
-                Text(value.gridSizedModel.title??"",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSize
-                )),
-                Text(value.gridSizedModel.title??"",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSize
-                )),
-              ],
-            )
+            FindTheWordRow(fontSize: fontSize, sizeWidth: sizeWidth, mainDashboardController: value,)
         ],
       ),
 
+    );
+  }
+}
+
+class FindTheWordRow extends StatelessWidget {
+ final MainDashboardController mainDashboardController;
+  const FindTheWordRow({
+    super.key,
+    required this.fontSize,
+    required this.sizeWidth,
+    required this.mainDashboardController
+  });
+
+  final double fontSize;
+  final double sizeWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text("Repeat",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: fontSize
+        )),
+        SizedBox(width: sizeWidth,),
+        GestureDetector(
+          onTap: () {
+            mainDashboardController.setRandomIndex();
+          },
+          child: Text("Skip",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: fontSize
+          )),
+        ),
+        SizedBox(width: sizeWidth,),
+        Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: fontSize
+        )),
+        SizedBox(width: sizeWidth,),
+        GestureDetector(
+          onTap: () {
+            mainDashboardController.setFindTheWord(false);
+            mainDashboardController.clearFindTheWrongList();
+            
+          },
+          child: Text("Done",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColor.appPrimaryColor,
+              fontSize: fontSize
+          )),
+        ),
+      ],
     );
   }
 }

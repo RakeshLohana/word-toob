@@ -5,6 +5,11 @@ class MyAssets{
   static String happy="https://conditionalpublications.com/wp-content/uploads/2013/07/b-410124-people_happy_.jpg";
 
 
+  static String correct="assets/correct.png";
+  static String wrong="assets/wrong.png";
+
+
+
   ///Preload Emotiosn
   static String basePath="assets/images/symbolset-emotions/";
   static String excited=basePath+"excited.jpg";

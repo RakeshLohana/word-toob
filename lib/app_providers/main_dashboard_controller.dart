@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -59,11 +60,21 @@ class MainDashboardController extends ChangeNotifier{
   bool get useSpeech  => _useSpeech;
 
 
+  bool _findWordImage=false ;
+  bool get findWordImage  => _findWordImage;
+
+
   bool _lottie=false ;
   bool get lottie  => _lottie;
 
   bool _findTheWord =false;
   bool get findTheWord=>_findTheWord;
+
+  String _targetFindWord ="";
+  String get targetFindWord=>_targetFindWord;
+
+  int _randomListIndex =0;
+  int get randomListIndex=>_randomListIndex;
 
 
   List<String> _videos=[];
@@ -82,6 +93,9 @@ class MainDashboardController extends ChangeNotifier{
 
   GridSizeModel _duplicateGridSizedModel=GridSizeModel();
   GridSizeModel get duplicateGridSizedModel=>_duplicateGridSizedModel;
+
+  List<int> _findTheWordWrongList=[];
+  List<int> get findTheWordWrongList=>_findTheWordWrongList;
 
 
 
@@ -291,14 +305,36 @@ class MainDashboardController extends ChangeNotifier{
 
 
   void setFindTheWord(bool value) {
+
      _findTheWord=value;
+
     notifyListeners();
   }
 
 
 
 
+  void setRandomIndex() {
+    _randomListIndex=Random().nextInt(gridSizedModel.listData!.length-1);
+    _targetFindWord=gridSizedModel.listData?[_randomListIndex].title??"";
+    flutterTts.speak( "Find ${_targetFindWord}");
+
+    notifyListeners();
+  }
 
 
+  void setFindTheWordWrongList(int index){
+    _findTheWordWrongList.add(index);
+    notifyListeners();
+  }
 
+  void clearFindTheWrongList(){
+     _findTheWordWrongList.clear();
+    notifyListeners();
+  }
+
+  void setFindWordImage(bool value){
+    _findWordImage=value;
+    notifyListeners();
+  }
 }
