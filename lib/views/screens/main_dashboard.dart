@@ -71,6 +71,7 @@ class _MainDashboardState extends State<MainDashboard> {
     super.initState();
 
     Future.microtask(()=>saveData());
+    _mainDashBoard.initSpeechToText();
    Future. microtask(()=>_mainDashBoard.getCurrentSelectedGridSizedModel(_contentProvider));
     _mainDashBoard.initTextToSpeech();
   }
@@ -250,11 +251,22 @@ class LeftRow extends StatelessWidget {
 
       Gap(sizeWidth),
 
-      IconButton(onPressed: () {
+      GestureDetector(
+        onTap: () {
+          value.setSpeechToText();
 
-      }, icon: Icon(Icons.mic,size: iconSize,)),
+        },
+        child: Container(
+          decoration: BoxDecoration(
+              color: value.speechToTextCheck? AppColor.blue:Colors.transparent,
+            borderRadius: BorderRadius.circular(20)
+          ),
+          padding: EdgeInsets.all(5),
+          child: Icon(Icons.mic,size: iconSize,color:value.speechToTextCheck?AppColor.white:AppColor.blue),
+        ),
+      ),
       Gap(sizeWidth),
-      if(value.lottie) Lottie.asset('assets/v_player.json',animate: value.lottie, ),
+      if(value.lottie||value.speechToTextCheck) Lottie.asset('assets/v_player.json',animate: value.lottie||value.speechToTextCheck, ),
 
     ],
                          );
@@ -769,6 +781,7 @@ class _EditWidgetState extends State<EditWidget> {
            GestureDetector(
              onTap: () async{
                widget.value.setDone();
+
 
              },
              child: Text("Done",style: Theme.of(context).textTheme.bodyMedium

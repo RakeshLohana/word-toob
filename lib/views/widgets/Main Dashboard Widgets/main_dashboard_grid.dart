@@ -23,19 +23,53 @@ class GridViewWidget extends StatefulWidget {
   State<GridViewWidget> createState() => _GridViewWidgetState();
 }
 
-class _GridViewWidgetState extends State<GridViewWidget> {
-  double _scale = 1.0;
+class _GridViewWidgetState extends State<GridViewWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
-  bool _zoomIn = true;
+  @override
+  void initState() {
+    super.initState();
 
-  Duration _duration = Duration(seconds: 2);
+    // Initialize AnimationController
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2), // Set animation duration
+    );
 
-  void _animateZoom() {
-    setState(() {
-      _scale = _zoomIn ? 3.0 : 1.0;
-      _zoomIn = !_zoomIn;
+    // Create an animation from scale 0.5 (zoom out) to scale 1.0 (zoom in)
+    _animation = Tween<double>(begin: 0.1, end: 0.5).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    // Dispose the controller when the widget is removed
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  // Define the function that triggers the animation
+  void _onImageTap(String image ) {
+    widget.value.setFindWordImagePath(image);
+    _controller.reset();
+    _controller.forward();
+    Future.delayed(Duration(seconds: 3), () async {
+      widget.value.setFindWordImage(false);
+
+      if(widget.value.foundSuccess){
+        widget.value.clearFindTheWrongList();
+        widget.value.setFoundSuccess(false);
+        widget.value.setRandomIndex();
+      }
+      // widget.value.setFindTheWord(false);
+
+
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,18 +108,24 @@ class _GridViewWidgetState extends State<GridViewWidget> {
                       final GridModel grid=widget.value.gridSizedModel.listData?[index]??GridModel();
                       final findTheWrongWord=!widget.value.findTheWordWrongList.contains(index);
 
-                        return widget.value.findTheWord? Stack(
+                        return widget.value.findTheWord ||widget.value.freePlay==false? Stack(
                           children: [
                             Builder(
                               builder: (context) =>
                                   GestureDetector(
                                     onTap: () {
                                       if(widget.value.targetFindWord==grid.title){
-                                        widget.value.setFindWordImage(widget.value.targetFindWord==grid.title);
-                                        _animateZoom();
+                                        widget.value.setFindWordImage(true);
+                                        widget.value.setFoundSuccess(true);
+                                        _onImageTap(MyAssets.correct);
+
 
                                       }else{
                                         widget.value.setFindTheWordWrongList(index);
+                                        widget.value.setFindWordImage(true);
+
+                                        _onImageTap(MyAssets.wrong);
+
 
                                       }
                                     },
@@ -212,14 +252,12 @@ class _GridViewWidgetState extends State<GridViewWidget> {
               ),
             ],
           ),
-      if( widget. value.findWordImage)  Align(
+      if( widget. value.findWordImage )  Align(
         alignment: Alignment.center,
-        child: AnimatedScale(
-              scale: _scale, // Scale value for zoom
-              duration: _duration, // Animation duration
-              curve: Curves.easeInOut, // Animation curve
+        child: ScaleTransition(
+              scale: _animation, // Scale value for zoom
               child: Image.asset(
-                 MyAssets.correct,
+                 widget.value.findWordImagePath,
                 width: 200,
                 height: 200,
               ),

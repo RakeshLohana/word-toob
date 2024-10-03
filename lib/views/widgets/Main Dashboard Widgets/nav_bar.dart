@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -49,6 +50,8 @@ class NormalNavBar extends StatelessWidget {
         "onTap":(){
 
           menuController.close();
+          value.setFreePlayOn(true);
+
 
 
         }
@@ -115,14 +118,21 @@ class FindTheWordRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text("Repeat",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: fontSize
-        )),
+        GestureDetector(
+          onTap: () {
+            mainDashboardController.setCurrentIndex();
+            mainDashboardController.clearFindTheWrongList();
+          },
+          child: Text("Repeat",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: fontSize
+          )),
+        ),
         SizedBox(width: sizeWidth,),
         GestureDetector(
           onTap: () {
             mainDashboardController.setRandomIndex();
+            mainDashboardController.clearFindTheWrongList();
           },
           child: Text("Skip",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
@@ -130,16 +140,24 @@ class FindTheWordRow extends StatelessWidget {
           )),
         ),
         SizedBox(width: sizeWidth,),
-        Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: fontSize
-        )),
+        SettingButton(fontSize: fontSize, gap: 5, value: mainDashboardController),
+        // GestureDetector(
+        //   onTap: () {
+        //
+        //   },
+        //   child: Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        //       fontWeight: FontWeight.bold,
+        //       fontSize: fontSize
+        //   )),
+        // ),
         SizedBox(width: sizeWidth,),
         GestureDetector(
           onTap: () {
             mainDashboardController.setFindTheWord(false);
             mainDashboardController.clearFindTheWrongList();
-            
+            mainDashboardController.setFindWordImage(false);
+
+
           },
           child: Text("Done",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,

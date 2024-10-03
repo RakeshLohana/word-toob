@@ -9,6 +9,8 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:popover/popover.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/common/app_constants/assets.dart';
 import 'package:word_toob/common/app_constants/general.dart';
@@ -20,6 +22,8 @@ import 'package:word_toob/views/widgets/custom_bottom_sheet.dart';
 import 'package:word_toob/views/widgets/edit_pop_over.dart';
 
 class MainDashboardController extends ChangeNotifier{
+
+
 
   int _gridSizeX=1;
   int get gridSizeX=>_gridSizeX;
@@ -70,8 +74,19 @@ class MainDashboardController extends ChangeNotifier{
   bool _findTheWord =false;
   bool get findTheWord=>_findTheWord;
 
+  bool _freePlay =false;
+  bool get freePlay=>_freePlay;
+
+
+
+  bool _foundSuccess =false;
+  bool get foundSuccess=>_foundSuccess;
+
   String _targetFindWord ="";
   String get targetFindWord=>_targetFindWord;
+
+  String _findWordImagePath ="";
+  String get findWordImagePath=>_findWordImagePath;
 
   int _randomListIndex =0;
   int get randomListIndex=>_randomListIndex;
@@ -98,7 +113,66 @@ class MainDashboardController extends ChangeNotifier{
   List<int> get findTheWordWrongList=>_findTheWordWrongList;
 
 
+  bool _speechToTextCheck =false;
+  bool get speechToTextCheck=>_speechToTextCheck;
 
+  void setSpeechToText(){
+    _speechToTextCheck=!_speechToTextCheck;
+    if(_speechToTextCheck){
+      startListening();
+    }
+    else{
+      stopListening();
+    }
+    notifyListeners();
+
+
+  }
+
+
+  ///Speech to text
+  SpeechToText speechToText = SpeechToText();
+  bool speechEnabled = false;
+  String lastWords = '';
+
+  void initSpeechToText() async {
+    speechEnabled = await speechToText.initialize();
+    notifyListeners();
+
+  }
+
+
+  void startListening() async {
+    await speechToText.listen(onResult: onSpeechResult);
+  }
+
+  /// Manually stop the active speech recognition session
+  /// Note that there are also timeouts that each platform enforces
+  /// and the SpeechToText plugin supports setting timeouts on the
+  /// listen method.
+  ///
+
+  void stopListening() async {
+    await speechToText.stop();
+  }
+
+
+  void onSpeechResult(SpeechRecognitionResult result) {
+    lastWords = result.recognizedWords;
+    if(gridSizedModel.listData?.contains(lastWords)??false){
+      int index=gridSizedModel.listData?.inde;
+
+    }
+
+
+    debugPrint(lastWords??"");
+
+  }
+
+
+
+
+  ///Text to speech
   FlutterTts _flutterTts = FlutterTts();
   FlutterTts  get flutterTts=>_flutterTts;
 
@@ -305,7 +379,6 @@ class MainDashboardController extends ChangeNotifier{
 
 
   void setFindTheWord(bool value) {
-
      _findTheWord=value;
 
     notifyListeners();
@@ -316,6 +389,13 @@ class MainDashboardController extends ChangeNotifier{
 
   void setRandomIndex() {
     _randomListIndex=Random().nextInt(gridSizedModel.listData!.length-1);
+    _targetFindWord=gridSizedModel.listData?[_randomListIndex].title??"";
+    flutterTts.speak( "Find ${_targetFindWord}");
+
+    notifyListeners();
+  }
+
+  void setCurrentIndex() {
     _targetFindWord=gridSizedModel.listData?[_randomListIndex].title??"";
     flutterTts.speak( "Find ${_targetFindWord}");
 
@@ -335,6 +415,24 @@ class MainDashboardController extends ChangeNotifier{
 
   void setFindWordImage(bool value){
     _findWordImage=value;
+    notifyListeners();
+  }
+
+  void setFindWordImagePath(String path){
+    _findWordImagePath=path;
+    notifyListeners();
+  }
+
+
+  void setFoundSuccess(bool value){
+    _foundSuccess=value;
+    notifyListeners();
+  }
+
+
+  void setFreePlayOn(bool value) {
+    _freePlay=value;
+
     notifyListeners();
   }
 }
