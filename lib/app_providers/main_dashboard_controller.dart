@@ -21,11 +21,16 @@ import 'package:word_toob/views/theme/app_color.dart';
 import 'package:word_toob/views/widgets/custom_bottom_sheet.dart';
 import 'package:word_toob/views/widgets/edit_pop_over.dart';
 
+import '../common/app_constants/route_strings.dart';
+
 class MainDashboardController extends ChangeNotifier{
 
 
 
   int _gridSizeX=1;
+
+  BuildContext? _contextForSpeechToText;
+
   int get gridSizeX=>_gridSizeX;
 
   int _gridSizeY=2;
@@ -116,10 +121,10 @@ class MainDashboardController extends ChangeNotifier{
   bool _speechToTextCheck =false;
   bool get speechToTextCheck=>_speechToTextCheck;
 
-  void setSpeechToText(){
+  void setSpeechToText(BuildContext context){
     _speechToTextCheck=!_speechToTextCheck;
     if(_speechToTextCheck){
-      startListening();
+      startListening(context);
     }
     else{
       stopListening();
@@ -142,8 +147,10 @@ class MainDashboardController extends ChangeNotifier{
   }
 
 
-  void startListening() async {
+  void startListening(BuildContext context) async {
     await speechToText.listen(onResult: onSpeechResult);
+    _contextForSpeechToText=context;
+    notifyListeners();
   }
 
   /// Manually stop the active speech recognition session
@@ -159,14 +166,20 @@ class MainDashboardController extends ChangeNotifier{
 
   void onSpeechResult(SpeechRecognitionResult result) {
     lastWords = result.recognizedWords;
-    if(gridSizedModel.listData?.contains(lastWords)??false){
-      int index=gridSizedModel.listData?.inde;
+    debugPrint(lastWords);
+    int index = gridSizedModel.listData?.indexWhere((gridModel) => gridModel.title == lastWords) ?? -1;
 
+
+    if (index != -1) {
+      debugPrint("Match found at index: $index");
+      GridModel matchedModel = gridSizedModel.listData?[index]??GridModel();
+      var rand=Random().nextInt(matchedModel.videosPath?.length??0+1);
+
+      Navigator.pushNamed(_contextForSpeechToText!, RouteStrings.videoPlayer,arguments: matchedModel.videosPath?[rand]);
+
+    } else {
+      debugPrint("No match found for: $lastWords");
     }
-
-
-    debugPrint(lastWords??"");
-
   }
 
 

@@ -12,6 +12,7 @@ import 'package:lottie/lottie.dart';
 import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:super_tooltip/super_tooltip.dart';
 import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/app_providers/main_dashboard_controller.dart';
@@ -28,6 +29,7 @@ import 'package:word_toob/views/widgets/bottom_sheet.dart';
 import 'package:word_toob/views/widgets/custom_menu_widget.dart';
 import 'package:word_toob/views/widgets/tool_tip_widget.dart';
 
+import '../../common/app_constants/app_keys.dart';
 import '../../common/app_constants/general.dart';
 import '../../source/models/grid_size_model.dart';
 
@@ -69,9 +71,10 @@ class _MainDashboardState extends State<MainDashboard> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    _mainDashBoard.setFreePlayOn(true);
     Future.microtask(()=>saveData());
     _mainDashBoard.initSpeechToText();
+
    Future. microtask(()=>_mainDashBoard.getCurrentSelectedGridSizedModel(_contentProvider));
     _mainDashBoard.initTextToSpeech();
   }
@@ -253,7 +256,7 @@ class LeftRow extends StatelessWidget {
 
       GestureDetector(
         onTap: () {
-          value.setSpeechToText();
+          value.setSpeechToText(context);
 
         },
         child: Container(
@@ -449,7 +452,7 @@ class RightRow extends StatelessWidget {
         ),
         Gap(sizeWidth),
 
-        SettingButton(fontSize: fontSize, gap: gap, value: value),
+        SettingButton(fontSize: fontSize, gap: gap, value: value,gameMenuController: menuController,),
 
 
         Gap(sizeWidth),
@@ -484,21 +487,33 @@ class HelpButton extends StatelessWidget {
   }
 }
 
-class SettingButton extends StatelessWidget {
-  const SettingButton({
+class SettingButton extends StatefulWidget {
+   SettingButton({
     super.key,
     required this.fontSize,
     required this.gap,
-    required this.value,
+    required this.value, required this.gameMenuController,
   });
 
   final double fontSize;
+  final MenuController gameMenuController;
   final double gap;
   final MainDashboardController value;
 
   @override
+  State<SettingButton> createState() => _SettingButtonState();
+}
+
+class _SettingButtonState extends State<SettingButton> {
+
+
+  MenuController menuController=MenuController();
+
+  @override
   Widget build(BuildContext context) {
-    return CustomMenuAnchor(menuItems: [
+    return CustomMenuAnchor(
+      menuController:menuController ,
+      menuItems: [
       CustomMenuItemButton(child:        Container(
         width: context.width*0.73,
         padding: EdgeInsets.symmetric(horizontal: 5),
@@ -518,10 +533,10 @@ class SettingButton extends StatelessWidget {
 
                   Gap(25),
                   Text("Tiles",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: fontSize+8,
+                      fontSize: widget.fontSize+8,
                       color:AppColor.appPrimaryColor.withOpacity(0.5)
                   )),
-                  Gap(gap),
+                  Gap(widget.gap),
 
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 5),
@@ -529,33 +544,36 @@ class SettingButton extends StatelessWidget {
                       children: [
                        GestureDetector(
                          onTap: () {
-                           value.wordsOnlyShowSettings(1);
+                           widget.value.wordsOnlyShowSettings(1);
+                           menuController.close();
                          },
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: [
                              Text("Symbols & Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                 fontSize: fontSize+10,
+                                 fontSize: widget.fontSize+10,
                                  color:AppColor.appPrimaryColor
                              )) ,
-                           value.settingsWordOnlyShow==1?  Icon(Icons.check,color: AppColor.green,):Container()
+                           widget.value.settingsWordOnlyShow==1?  Icon(Icons.check,color: AppColor.green,):Container()
                            ],
                          ),
                        ),
-                        Gap(gap),
+                        Gap(widget.gap),
                        GestureDetector(
                          onTap: () {
-                           value.wordsOnlyShowSettings(2);
+                           widget.value.wordsOnlyShowSettings(2);
+                           menuController.close();
+
                          },
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                            children: [
                              Text("Word Only",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                 fontSize: fontSize+10,
+                                 fontSize: widget.fontSize+10,
                                  color:AppColor.appPrimaryColor
                              )) ,
-                           value.settingsWordOnlyShow==2?  Icon(Icons.check,color: AppColor.green,):Container()
+                           widget.value.settingsWordOnlyShow==2?  Icon(Icons.check,color: AppColor.green,):Container()
 
                            ],
                          ),
@@ -566,120 +584,144 @@ class SettingButton extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Gap(gap),
+                  Gap(widget.gap),
 
-
-                  Text("SPEECH OUTPUT",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: fontSize+5,
-                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                  )),
-                  Gap(gap),
-
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Use Speech",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: fontSize+10,
-                                color:AppColor.appPrimaryColor
-                            )) ,
-                            Switch(
-                              activeColor: AppColor.white,
-                                activeTrackColor: AppColor.green,
-                                value: value.useSpeech, onChanged: (valueNew){
-                                value.useSpeechFunction();
-
-                            })
-                          ],
-                        ),
-                        Gap(10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                          children: [
-                            Text("Voice",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: fontSize+10,
-                                color:AppColor.appPrimaryColor
-                            )),
-                            Text("English (United States)",
-                                maxLines: 2,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: fontSize+5,
-
-                                color:AppColor.appPrimaryColor
-                            )) ,
-
-
-                          ],
-                        ),
-
-
-
-
-
-
-                      ],
-                    ),
-                  ),
-                  Gap(gap),
-
-                  Text("SPEECH RECOGNITION",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: fontSize+5,
-                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                  )),
-                  Gap(gap),
-
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("English ",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: fontSize+10,
-                                color:AppColor.appPrimaryColor
-                            )) ,
-                            Icon(Icons.check,color: AppColor.green,)
-                          ],
-                        ),
-                        Gap(gap),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                          children: [
-                            Text("Spanish",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: fontSize+10,
-                                color:AppColor.appPrimaryColor
-                            )) ,
-                            Icon(Icons.check,color: AppColor.green,)
-
-                          ],
-                        ),
-
-
-
-                      ],
-                    ),
-                  ),
-                  Gap(gap),
+                  //
+                  // Text("SPEECH OUTPUT",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //     fontSize: fontSize+5,
+                  //     color:AppColor.appPrimaryColor.withOpacity(0.5)
+                  // )),
+                  // Gap(gap),
+                  //
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(horizontal: 5),
+                  //   child: Column(
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text("Use Speech",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //               fontSize: fontSize+10,
+                  //               color:AppColor.appPrimaryColor
+                  //           )) ,
+                  //           Switch(
+                  //             activeColor: AppColor.white,
+                  //               activeTrackColor: AppColor.green,
+                  //               value: value.useSpeech, onChanged: (valueNew){
+                  //               value.useSpeechFunction();
+                  //
+                  //           })
+                  //         ],
+                  //       ),
+                  //       Gap(10),
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //
+                  //         children: [
+                  //           Text("Voice",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //               fontSize: fontSize+10,
+                  //               color:AppColor.appPrimaryColor
+                  //           )),
+                  //           Text("English (United States)",
+                  //               maxLines: 2,
+                  //               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //               fontSize: fontSize+5,
+                  //
+                  //               color:AppColor.appPrimaryColor
+                  //           )) ,
+                  //
+                  //
+                  //         ],
+                  //       ),
+                  //
+                  //
+                  //
+                  //
+                  //
+                  //
+                  //     ],
+                  //   ),
+                  // ),
+                  // Gap(gap),
+                  //
+                  // Text("SPEECH RECOGNITION",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //     fontSize: fontSize+5,
+                  //     color:AppColor.appPrimaryColor.withOpacity(0.5)
+                  // )),
+                  // Gap(gap),
+                  //
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(horizontal: 5),
+                  //   child: Column(
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text("English ",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //               fontSize: fontSize+10,
+                  //               color:AppColor.appPrimaryColor
+                  //           )) ,
+                  //           Icon(Icons.check,color: AppColor.green,)
+                  //         ],
+                  //       ),
+                  //       Gap(gap),
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //
+                  //         children: [
+                  //           Text("Spanish",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //               fontSize: fontSize+10,
+                  //               color:AppColor.appPrimaryColor
+                  //           )) ,
+                  //           Icon(Icons.check,color: AppColor.green,)
+                  //
+                  //         ],
+                  //       ),
+                  //
+                  //
+                  //
+                  //     ],
+                  //   ),
+                  // ),
+                  // Gap(gap),
 
 
                   Text("GAME OPTIONS",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: fontSize+8,
+                      fontSize: widget.fontSize+8,
                       color:AppColor.appPrimaryColor.withOpacity(0.5)
                   )),
-                  Gap(gap),
+                  Gap(widget.gap),
 
 
-                  Text("Find The Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: fontSize+10,
-                      color:AppColor.appPrimaryColor.withOpacity(0.5)
-                  )),
+                  GestureDetector(
+                    onTap: () {
+                      menuController.close();
+                      widget.gameMenuController.open();
 
+                    },
+                    child: Text("Find The Word",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: widget.fontSize+10,
+                        color:AppColor.appPrimaryColor.withOpacity(0.5)
+                    )),
+                  ),
+                  Gap(widget.gap),
+
+                  GestureDetector(
+                    onTap: () {
+                      menuController.close();
+                      Share.share(
+                              'Welcome to Word Toob! 📚✨ \n'
+                              'Whether you’re a beginner or an expert, Word Toob makes learning languages fun and addictive! 🌍🎉 \n'
+                              'Download now and join the adventure: ${AppKeys.appStore}\n'
+                                  'For more info visit: http://wordtoob.com/index.html'
+                      );
+
+                    },
+                    child: Text("Share",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: widget.fontSize+10,
+                        color:AppColor.appPrimaryColor.withOpacity(0.5)
+                    )),
+                  ),
 
 
                 ],
@@ -690,7 +732,7 @@ class SettingButton extends StatelessWidget {
       ),)
     ], titleWidget:  Text("Settings",style: Theme.of(context).textTheme.bodyMedium?.copyWith(
         fontWeight: FontWeight.bold,
-        fontSize: fontSize
+        fontSize: widget.fontSize
     )),
     );
   }

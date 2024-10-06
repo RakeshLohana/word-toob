@@ -94,7 +94,7 @@ class NormalNavBar extends StatelessWidget {
           if(!value.findTheWord)
             RightRow(menuController: menuController, gameMap: gameMap, fontSize: fontSize, sizeWidth: sizeWidth, value: value, gap: gap)
           else
-            FindTheWordRow(fontSize: fontSize, sizeWidth: sizeWidth, mainDashboardController: value,)
+            FindTheWordRow(fontSize: fontSize, sizeWidth: sizeWidth, mainDashboardController: value,menuController: menuController,)
         ],
       ),
 
@@ -108,10 +108,11 @@ class FindTheWordRow extends StatelessWidget {
     super.key,
     required this.fontSize,
     required this.sizeWidth,
-    required this.mainDashboardController
+    required this.mainDashboardController, required this.menuController
   });
 
   final double fontSize;
+  final MenuController menuController;
   final double sizeWidth;
 
   @override
@@ -140,7 +141,7 @@ class FindTheWordRow extends StatelessWidget {
           )),
         ),
         SizedBox(width: sizeWidth,),
-        SettingButton(fontSize: fontSize, gap: 5, value: mainDashboardController),
+        SettingButton(fontSize: fontSize, gap: 5, value: mainDashboardController,gameMenuController: menuController ),
         // GestureDetector(
         //   onTap: () {
         //
