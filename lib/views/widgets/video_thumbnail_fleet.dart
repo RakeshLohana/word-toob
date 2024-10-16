@@ -252,40 +252,48 @@ class VideoPlayerView extends StatefulWidget {
 }
 class _VideoPlayerViewState extends State<VideoPlayerView> {
   late VideoPlayerController _controller;
+  bool _hasNavigated = false;
+
   @override
   void initState() {
-    if(widget.url.contains("asset")){
+    super.initState();
+
+    // Check if the video is an asset or a file
+    if (widget.url.contains("asset")) {
       _controller = VideoPlayerController.asset(widget.url,
-          videoPlayerOptions: VideoPlayerOptions(
-
-          ))
+          videoPlayerOptions: VideoPlayerOptions())
         ..initialize().then((_) {
           setState(() {
             _controller.play();
           });
         });
-      super.initState();
-      _controller.addListener(() {
-        setState(() {});
-      });
-
-    }else{
+    } else {
       _controller = VideoPlayerController.file(File(widget.url),
-          videoPlayerOptions: VideoPlayerOptions(
-
-          ))
+          videoPlayerOptions: VideoPlayerOptions())
         ..initialize().then((_) {
           setState(() {
             _controller.play();
           });
         });
-      super.initState();
-      _controller.addListener(() {
-        setState(() {});
-      });
     }
 
+    // Add listener for video player updates
+    _controller.addListener(() {
+      setState(() {
+        // Check if the video has finished playing and the navigation hasn't occurred yet
+        if (!_hasNavigated &&
+            _controller.value.position >= _controller.value.duration) {
+          // Pop the current screen to go back to the previous one
+          Navigator.of(context).pop();
+          _hasNavigated = true; // Ensure this only happens once
+          print("going back----------->");
+        }
+      });
+    });
   }
+
+
+
 
   @override
   void dispose() {
