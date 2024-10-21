@@ -31,13 +31,11 @@ class _GridViewWidgetState extends State<GridViewWidget> with SingleTickerProvid
   void initState() {
     super.initState();
 
-    // Initialize AnimationController
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2), // Set animation duration
     );
 
-    // Create an animation from scale 0.5 (zoom out) to scale 1.0 (zoom in)
     _animation = Tween<double>(begin: 0.1, end: 0.5).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -178,13 +176,19 @@ class _GridViewWidgetState extends State<GridViewWidget> with SingleTickerProvid
                                     // value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy );
                                     widget.value.setItemOnEditState(
                                         hide: grid.hidetitle??false,
-                                        index,context,title:grid.title??'' ,picture: grid.imagepath??"",id: widget.value.gridSizedModel.id??-1,videoPath: grid.videosPath??[],gridIndex: widget.value.gridIndex );
+                                        index,context,title:grid.title??'' ,
+                                        picture: grid.imagepath??"",
+                                        id: widget.value.gridSizedModel.id??-1,
+                                        videoPath: grid.videosPath??[],
+                                        gridIndex: widget.value.gridIndex );
                                     if(!widget.value.editPressed){
-                                      widget.value.setLottie();
-                                      widget.value.flutterTts.speak(  grid.title??"nothing");
-                                      if(grid.videosPath?.isNotEmpty??true   && grid.videosPath!.length>1){
+                                      if(grid.videosPath?.isNotEmpty??true   && (grid.videosPath?.length??0)>1){
+                                        widget.value.setLottie();
+                                        widget.value.flutterTts.speak(  grid.title??"");
                                         var rand=Random().nextInt(grid.videosPath?.length??0+1);
                                         Navigator.pushNamed(context, RouteStrings.videoPlayer,arguments: grid.videosPath?[rand]);
+                                      }else{
+                                        printLog("Error occured no item  ");
                                       }
 
                                     }

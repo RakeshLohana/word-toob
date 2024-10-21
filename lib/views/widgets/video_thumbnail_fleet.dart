@@ -277,13 +277,10 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         });
     }
 
-    // Add listener for video player updates
     _controller.addListener(() {
       setState(() {
-        // Check if the video has finished playing and the navigation hasn't occurred yet
         if (!_hasNavigated &&
             _controller.value.position >= _controller.value.duration) {
-          // Pop the current screen to go back to the previous one
           Navigator.of(context).pop();
           _hasNavigated = true; // Ensure this only happens once
           print("going back----------->");

@@ -74,7 +74,7 @@ class ContentProvider extends ChangeNotifier{
 
   Future<void> updateGridSizeModelData(
       {
-        required int id, // Assuming there's an ID to identify the specific model
+        required int id,
         String? title,
         bool? hideModel,
         List<GridModel>? listData,
@@ -89,10 +89,14 @@ class ContentProvider extends ChangeNotifier{
     try{
        await iAppRepository.
        updateGridSizedModel(id: id,
-           listData:listData,title: title,
+           listData:listData,
+           title: title,
            duplicateCount: duplicateCount,
            currentSelected: currentSelected,hideModel: hideModel,
-           gridSizeY: gridSizeY,gridSizeX: gridSizeX );
+           gridSizeY: gridSizeY,gridSizeX: gridSizeX ).then((value) async{
+         await getAllGridSizeModel();
+
+       }, );
        notifyListeners();
       updateGridSizeModelStatus = Status.loaded;
     }on Exception catch (e){
@@ -133,6 +137,7 @@ class ContentProvider extends ChangeNotifier{
       );
       notifyListeners();
       _allGridSizedModel=await iAppRepository.getAllGridSizedModel();
+
       notifyListeners();
       updateGridListDataStatus = Status.loaded;
     }on Exception catch (e){

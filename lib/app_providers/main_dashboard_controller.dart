@@ -275,13 +275,55 @@ class MainDashboardController extends ChangeNotifier{
   }
 
 
-  setHideButton(){
-    _gridSizedModel.setHide();
+  Future<void> setHideButton(ContentProvider contentProvider) async {
+    printLog("grid index " + _gridIndex.toString());
+
+    // Check if gridSizedModel has an ID
+    if (_gridSizedModel.id != null) {
+      // Await the update operation to ensure it completes before proceeding
+      await contentProvider.updateGridSizeModelData(
+        id: _gridSizedModel.id!,
+        hideModel: true,
+      );
+
+      // After updating, fetch the updated model and reassign _gridSizedModel
+      _gridSizedModel = GridSizeModel();  // Resetting the model
+      GridSizeModel gridModel = contentProvider.allGridSizedModel
+          .firstWhere((element) => element.id == 1);
+
+      printLog(gridModel.toJson());
+
+      // Update the local _gridSizedModel with the new data
+      _gridSizedModel = contentProvider.allGridSizedModel[_gridIndex];
+    }
+
+    // Notify listeners about the update
     notifyListeners();
   }
 
-  showAllButton(){
-    _gridSizedModel.showHide();
+  Future<void> showAllButton(ContentProvider contentProvider) async {
+    printLog("grid index " + _gridIndex.toString());
+
+    // Check if gridSizedModel has an ID
+    if (_gridSizedModel.id != null) {
+      // Await the update operation to ensure it completes before proceeding
+      await contentProvider.updateGridSizeModelData(
+        id: _gridSizedModel.id!,
+        hideModel: false, // Show the model
+      );
+
+      // After updating, fetch the updated model and reassign _gridSizedModel
+      _gridSizedModel = GridSizeModel();  // Resetting the model
+      GridSizeModel gridModel = contentProvider.allGridSizedModel
+          .firstWhere((element) => element.id == 1);
+
+      printLog(gridModel.toJson());
+
+      // Update the local _gridSizedModel with the new data
+      _gridSizedModel = contentProvider.allGridSizedModel[_gridIndex];
+    }
+
+    // Notify listeners about the update
     notifyListeners();
   }
 

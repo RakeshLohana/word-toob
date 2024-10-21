@@ -822,10 +822,8 @@ abstract class AppUtility {
 
 
   static Future<Uint8List> loadAssetImageAsUint8List(String path) async {
-    // Load the image as ByteData
     ByteData byteData = await rootBundle.load(path);
 
-    // Convert ByteData to Uint8List
     Uint8List uint8list = byteData.buffer.asUint8List();
 
     return uint8list;
@@ -878,12 +876,11 @@ abstract class AppUtility {
                                 listData: List.generate(item.listData?.length ?? 0, (i) => GridModel()),
                               );
 
-                              // Perform actions using the value and model
                               value.setGridSize(item.gridSizeX ?? 1, item.gridSizeY ?? 2);
                               value.setGridSizedModel(model,index);
+
                               contentProvider.saveGridSizedModel(gridSizedModel: model);
 
-                              // Close the dialog or screen
                               Navigator.pop(context);
                             },
                             child: Center(

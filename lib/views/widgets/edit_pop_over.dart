@@ -132,9 +132,7 @@ class _EditPopOverState extends State<EditPopOver> {
                               contentProvider.updateListDataItem(id: widget.id, itemIndex: widget.index,hideTitle:!widget.hide);
                               contentProvider.getAllGridSizeModel();
                               mainDashboardController.setGridSizedModel(contentProvider.allGridSizedModel[mainDashboardController.gridIndex], mainDashboardController.gridIndex);
-                              setState(() {
-
-                              });
+                              setState(() {});
                             },
                             child: Text( widget.hide? "Hide Word":"Unhide word",
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(

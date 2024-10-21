@@ -51,6 +51,19 @@ class GridSizeModel{
   }
 
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'gridSizeX': gridSizeX,
+      'gridSizeY': gridSizeY,
+      'title': title,
+      'hideModel': hideModel,
+      'listData': listData?.map((item) => item.toJson()).toList(),
+      'duplicateCount': duplicateCount,
+      'currentSelected': currentSelected,
+    };
+  }
+
 }
 
 

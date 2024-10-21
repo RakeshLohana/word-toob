@@ -97,7 +97,6 @@ class LocalClient{
         gridSizedLocal.currentSelected = currentSelected ?? gridSizedLocal.currentSelected;
         gridSizedLocal.duplicateCount = duplicateCount ?? gridSizedLocal.duplicateCount;
 
-        // Handle listData update
         if (listData != null) {
           gridSizedLocal.listDataJson = GridSizedLocal().setListData(listData);
         }
@@ -129,23 +128,18 @@ class LocalClient{
         List<GridModel>? listData = GridSizedLocal().getListData(gridSizedLocal.listDataJson);
 
         if (itemIndex >= 0 && itemIndex < listData!.length) {
-          // Fetch the specific GridModel item at the given index
           GridModel gridModelItem = listData[itemIndex];
 
-          // Update only the provided (non-null) fields of the GridModel item
           gridModelItem.title = title ?? gridModelItem.title;
           gridModelItem.imagepath = imagePath ?? gridModelItem.imagepath;
           gridModelItem.videosPath = videosPath ?? gridModelItem.videosPath;
           gridModelItem.hideImage = hideImage ?? gridModelItem.hideImage;
           gridModelItem.hidetitle = hideTitle ?? gridModelItem.hidetitle;
 
-          // Replace the updated item back into the list
           listData[itemIndex] = gridModelItem;
 
-          // Convert the updated list back to JSON and save it in the database
           gridSizedLocal.listDataJson = GridSizedLocal().setListData(listData);
 
-          // Save the updated object back to the database
           await isar.gridSizedLocals.put(gridSizedLocal);
           print("Local GridSizedModel listData item updated at index $itemIndex");
         } else {

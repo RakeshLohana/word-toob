@@ -205,7 +205,7 @@ class _MainDashboardState extends State<MainDashboard> {
               if(!mainDashBoarState.editPressed)
                 NormalNavBar(addMap: addMap, sizeWidth: sizeWidth,value: mainDashBoarState,contentProvider: contentState,menuController: MenuController(),)
                 else
-                  EditWidget(sizeWidth: sizeWidth, controler: _controler,value: mainDashBoarState,),
+                  EditWidget(sizeWidth: sizeWidth, controler: _controler,value: mainDashBoarState, contentProvider: contentState,),
                   GridViewWidget(value:mainDashBoarState ,),
                 ],
               ),
@@ -740,10 +740,11 @@ class _SettingButtonState extends State<SettingButton> {
 
 class EditWidget extends StatefulWidget {
   final MainDashboardController value;
+  final ContentProvider contentProvider;
   const EditWidget({
     super.key,
     required this.sizeWidth,
-    required TextEditingController controler, required this.value,
+    required TextEditingController controler, required this.value, required this.contentProvider,
   }) : _controler = controler;
 
   final double sizeWidth;
@@ -767,8 +768,9 @@ class _EditWidgetState extends State<EditWidget> {
          mainAxisAlignment: MainAxisAlignment.spaceBetween,
          children: [
            GestureDetector(
-                   onTap: () {
-                       widget.value.setHideButton();
+                   onTap: ()  async {
+
+                     await  widget.value.setHideButton(widget.contentProvider);
 
 
 
@@ -784,7 +786,7 @@ class _EditWidgetState extends State<EditWidget> {
            Gap(widget.sizeWidth+20),
            GestureDetector(
              onTap: () async{
-               widget.value.showAllButton();
+             await  widget.value.showAllButton(widget.contentProvider);
 
              },
              child: Text("Show All",style: Theme.of(context).textTheme.bodyMedium
