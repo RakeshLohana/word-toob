@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
 
@@ -866,8 +867,7 @@ abstract class AppUtility {
                           var item = entry.value; // The item
 
                           return GestureDetector(
-                            onTap: () {
-                              // Create a new GridSizeModel object
+                            onTap: () async {
                               GridSizeModel model = GridSizeModel(
                                 gridSizeX: item.gridSizeX,
                                 hideModel: false,
@@ -876,10 +876,13 @@ abstract class AppUtility {
                                 listData: List.generate(item.listData?.length ?? 0, (i) => GridModel()),
                               );
 
-                              value.setGridSize(item.gridSizeX ?? 1, item.gridSizeY ?? 2);
-                              value.setGridSizedModel(model,index);
+                              // value.setGridSize(item.gridSizeX ?? 1, item.gridSizeY ?? 2);
+                              // value.setGridSizedModel(model,index);
 
-                              contentProvider.saveGridSizedModel(gridSizedModel: model);
+                            await  contentProvider.saveGridSizedModel(gridSizedModel: model);
+                              value.setGridSizedModel(contentProvider.allGridSizedModel.last,contentProvider.allGridSizedModel.length-1);
+                              printLog("This is gridsizemodel when adding"+contentProvider.allGridSizedModel.last.toJson().toString());
+                              printLog("This is last index when adding"+contentProvider.allGridSizedModel.length.toString());
 
                               Navigator.pop(context);
                             },

@@ -73,7 +73,7 @@ class _MainDashboardState extends State<MainDashboard> {
     super.initState();
     _mainDashBoard.setFreePlayOn(true);
     Future.microtask(()=>saveData());
-    _mainDashBoard.initSpeechToText();
+    Future.microtask(()=>_mainDashBoard.initSpeechToText());
 
    Future. microtask(()=>_mainDashBoard.getCurrentSelectedGridSizedModel(_contentProvider));
     _mainDashBoard.initTextToSpeech();
@@ -167,8 +167,11 @@ class _MainDashboardState extends State<MainDashboard> {
            "name":AppString.newBoard,
            "onTap":(){
              _contentProvider.getAllGridSizeModel();
-             AppUtility.showCustomDialog(context: context, title: AppString.newBoard, list:gridSizeModelInitialized.reversed.toList(),
-               contentProvider: _contentProvider 
+             AppUtility.showCustomDialog(
+                 context: context,
+                 title: AppString.newBoard,
+                 list:gridSizeModelInitialized.reversed.toList(),
+               contentProvider: _contentProvider,
 
 
 
@@ -202,11 +205,11 @@ class _MainDashboardState extends State<MainDashboard> {
              },
              child: Column(
                 children: [
-              if(!mainDashBoarState.editPressed)
+              if(!mainDashBoarState.editPressedYello)
                 NormalNavBar(addMap: addMap, sizeWidth: sizeWidth,value: mainDashBoarState,contentProvider: contentState,menuController: MenuController(),)
                 else
                   EditWidget(sizeWidth: sizeWidth, controler: _controler,value: mainDashBoarState, contentProvider: contentState,),
-                  GridViewWidget(value:mainDashBoarState ,),
+                  GridViewWidget(value:mainDashBoarState ,contentProvider: contentState,),
                 ],
               ),
            ),
@@ -359,7 +362,8 @@ class MyBoardsButton extends StatelessWidget {
       return ListTile(
         onTap: () {
           value.setGridSize(contentProvider.allGridSizedModel[index].gridSizeX??1, contentProvider.allGridSizedModel[index].gridSizeY??2);
-          value.setGridSizedModel(contentProvider.allGridSizedModel[index],value.gridIndex);
+          value.setGridSizedModel(contentProvider.allGridSizedModel[index],index);
+          printLog(index.toString()+"it is index");
 
           int count=contentProvider.allGridSizedModel[index].duplicateCount+1;
 
@@ -381,7 +385,7 @@ class MyBoardsButton extends StatelessWidget {
           menuController.close();
 
         },
-        visualDensity: VisualDensity(horizontal: -4,vertical: -4),
+        visualDensity:const VisualDensity(horizontal: -4,vertical: -4),
         title: Text(contentProvider.allGridSizedModel[index].title??""),
 
       );

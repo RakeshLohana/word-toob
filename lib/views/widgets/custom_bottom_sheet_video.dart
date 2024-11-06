@@ -5,20 +5,20 @@ import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:word_toob/app_providers/content_provider.dart';
 import 'package:word_toob/app_providers/main_dashboard_controller.dart';
+import 'package:word_toob/common/app_constants/general.dart';
 import 'package:word_toob/common/utils/app_utility.dart';
 import 'package:word_toob/views/theme/app_color.dart';
 
 class CustomBottomSheetVideo extends StatelessWidget {
-  final MainDashboardController controller;
   final int id;
   final int index;
   final int gridIndex;
-  CustomBottomSheetVideo({required this.controller, required this.id, required this.index, required this.gridIndex});
+  CustomBottomSheetVideo({ required this.id, required this.index, required this.gridIndex});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ContentProvider>(
-      builder: (context, contentProvider, child) =>
+    return Consumer2<ContentProvider,MainDashboardController>(
+      builder: (context, contentProvider, controller,child) =>
        Padding(
         padding: EdgeInsets.all(5.0),
         child: Column(
@@ -35,10 +35,13 @@ class CustomBottomSheetVideo extends StatelessWidget {
                   GestureDetector(
                     onTap: ()async {
                      var video= await  AppUtility.videoFromCamera();
+                     printLog("index of each grid model"+index.toString());
+                     printLog("index of each grid model"+index.toString());
 
                      controller.addVideoToList(video!.path,);
-                     contentProvider.updateListDataItem(id: id, itemIndex: index,videosPath:controller.videos );
-                     controller.setGridSizedModel(contentProvider.allGridSizedModel[controller.gridIndex],controller.gridIndex);
+                    await contentProvider.updateListDataItem(id:controller.gridSizedModel.id??-1,
+                         itemIndex: index,videosPath:controller.videos );
+                    await controller.setGridSizedModel(contentProvider.allGridSizedModel[controller.gridIndex],controller.gridIndex);
                      controller.toggleBottomSheetOffVideo();
                     },
                     child: Container(

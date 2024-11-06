@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -25,7 +26,7 @@ import '../common/app_constants/route_strings.dart';
 
 class MainDashboardController extends ChangeNotifier{
 
-
+  TextEditingController  editTitleTextEditingController=TextEditingController();
 
   int _gridSizeX=1;
 
@@ -36,8 +37,8 @@ class MainDashboardController extends ChangeNotifier{
   int _gridSizeY=2;
   int get gridSizeY=>_gridSizeY;
 
-  bool _editPressed=false;
-  bool get editPressed=>_editPressed;
+  bool _editPressedYello=false;
+  bool get editPressedYello=>_editPressedYello;
 
 
   int? _itemClickedOnEditState;
@@ -140,7 +141,7 @@ class MainDashboardController extends ChangeNotifier{
   bool speechEnabled = false;
   String lastWords = '';
 
-  void initSpeechToText() async {
+  Future<void> initSpeechToText() async {
     speechEnabled = await speechToText.initialize();
     notifyListeners();
 
@@ -278,52 +279,78 @@ class MainDashboardController extends ChangeNotifier{
   Future<void> setHideButton(ContentProvider contentProvider) async {
     printLog("grid index " + _gridIndex.toString());
 
-    // Check if gridSizedModel has an ID
     if (_gridSizedModel.id != null) {
-      // Await the update operation to ensure it completes before proceeding
-      await contentProvider.updateGridSizeModelData(
-        id: _gridSizedModel.id!,
-        hideModel: true,
-      );
+      for (int i =0 ;i<(_gridSizedModel.listData?.length??0);i++){
+        await contentProvider.updateListDataItem(
+          itemIndex: i,
+          hideTitle: true,
+          hideImage: true,
+          id: _gridSizedModel.id!,
+        );
+      }
 
-      // After updating, fetch the updated model and reassign _gridSizedModel
-      _gridSizedModel = GridSizeModel();  // Resetting the model
-      GridSizeModel gridModel = contentProvider.allGridSizedModel
-          .firstWhere((element) => element.id == 1);
 
-      printLog(gridModel.toJson());
+      // _gridSizedModel = GridSizeModel();  // Resetting the model
+      // GridSizeModel gridModel = contentProvider.allGridSizedModel
+      //     .firstWhere((element) => element.id == 1);
+      //
+      // printLog(gridModel.toJson());
 
-      // Update the local _gridSizedModel with the new data
       _gridSizedModel = contentProvider.allGridSizedModel[_gridIndex];
     }
 
-    // Notify listeners about the update
     notifyListeners();
   }
 
   Future<void> showAllButton(ContentProvider contentProvider) async {
     printLog("grid index " + _gridIndex.toString());
 
-    // Check if gridSizedModel has an ID
     if (_gridSizedModel.id != null) {
-      // Await the update operation to ensure it completes before proceeding
-      await contentProvider.updateGridSizeModelData(
-        id: _gridSizedModel.id!,
-        hideModel: false, // Show the model
-      );
+      for (int i =0 ;i<(_gridSizedModel.listData?.length??0);i++){
+        await contentProvider.updateListDataItem(
+          itemIndex: i,
+          hideTitle: false,
+          hideImage: false,
+          id: _gridSizedModel.id!,
+        );
+      }
 
-      // After updating, fetch the updated model and reassign _gridSizedModel
-      _gridSizedModel = GridSizeModel();  // Resetting the model
-      GridSizeModel gridModel = contentProvider.allGridSizedModel
-          .firstWhere((element) => element.id == 1);
+      // _gridSizedModel = GridSizeModel();
 
-      printLog(gridModel.toJson());
+      // GridSizeModel gridModel = contentProvider.allGridSizedModel
+      //     .firstWhere((element) => element.id == _gridIndex);
+      //
+      // printLog(gridModel.toJson());
 
-      // Update the local _gridSizedModel with the new data
       _gridSizedModel = contentProvider.allGridSizedModel[_gridIndex];
     }
 
-    // Notify listeners about the update
+    notifyListeners();
+  }
+
+
+  Future<void> hideOrShowEachGrid(ContentProvider contentProvider,int index,{required bool hideImage,required bool hideTitle}) async {
+    printLog("grid index model " + _gridIndex.toString());
+    printLog("grid index list data " + index.toString());
+
+    if (_gridSizedModel.id != null) {
+
+
+      await contentProvider.updateListDataItem(
+        itemIndex: index,
+        hideImage: hideImage,
+        hideTitle: hideTitle,
+        id: _gridSizedModel.id!,
+      );
+      printLog(contentProvider.allGridSizedModel[_gridIndex].listData?[index].toJson());
+      printLog(contentProvider.allGridSizedModel[_gridIndex].toJson());
+
+      _gridSizedModel = contentProvider.allGridSizedModel[_gridIndex];
+
+      notifyListeners();
+
+    }
+
     notifyListeners();
   }
 
@@ -380,16 +407,17 @@ class MainDashboardController extends ChangeNotifier{
 
 
   void setEdit(bool value){
-    _editPressed=value;
+    _editPressedYello=value;
     notifyListeners();
   }
 
   void setDone(){
-    _editPressed=false;
-    _itemClickedOnEditState=null;
+    _editPressedYello=false;
+    // _itemClickedOnEditState=null;
     _itemClickeBool=false;
     notifyListeners();
   }
+
 
 
   void setGridSize(int sizeX,int sizeY){
@@ -406,16 +434,15 @@ class MainDashboardController extends ChangeNotifier{
     required List<String> videoPath,
     required int gridIndex }) {
 
-    if (_editPressed) {
-      _itemClickedOnEditState = index;
+    if (_editPressedYello) {
+      // _itemClickedOnEditState = index;
       _itemClickeBool = true;
       _showBottomSheetVideo=false;
       _showBottomSheet=false;
       _isEditPressed=false;
       _imagePath='';
-      AppUtility.popOver(context,EditPopOver(title: title, picture: picture,index: index,id: id,gridIndex:gridIndex ,hide:hide ,),
-
-          direct: PopoverDirection.top  ,heightSize: context.height*1.2,widthSize: context.width*0.9);
+      AppUtility.popOver(context,EditPopOver(title: title, picture: picture,
+        index: index,id: id,gridIndex:gridIndex ,hide:hide ,), direct: PopoverDirection.top  ,heightSize: context.height*1.2,widthSize: context.width*0.9);
       _videos.clear();
       _videos.addAll(videoPath);
       notifyListeners();
@@ -427,8 +454,8 @@ class MainDashboardController extends ChangeNotifier{
   }
 
 
-  void isEditPressedFun() {
-     _isEditPressed=!_isEditPressed;
+  void isEditPressedFun(bool value) {
+     _isEditPressed=value;
     notifyListeners();
   }
 
@@ -488,6 +515,20 @@ class MainDashboardController extends ChangeNotifier{
   void setFreePlayOn(bool value) {
     _freePlay=value;
 
+    notifyListeners();
+  }
+
+
+
+  void setEditTitleControllerText(String text){
+    editTitleTextEditingController.text=text;
+    notifyListeners();
+  }
+  void clearEditTitleControllerText(){
+     if(editTitleTextEditingController.text.isNotEmpty){
+       editTitleTextEditingController.clear();
+
+     }
     notifyListeners();
   }
 }

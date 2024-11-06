@@ -315,22 +315,22 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
               )
                   : const CircularProgressIndicator(),
             ),
-            IconButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-              icon: Container(
-
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: Colors.grey[300]!.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(200)
-                ),
-                child: Icon(Icons.arrow_back,
-                    size: 10,
-                    color: Theme.of(context).inputDecorationTheme.iconColor),
-              ),
-            ),
+            // IconButton(
+            //   onPressed: (){
+            //     Navigator.of(context).pop();
+            //   },
+            //   icon: Container(
+            //
+            //     padding: const EdgeInsets.all(5),
+            //     decoration: BoxDecoration(
+            //         color: Colors.grey[300]!.withOpacity(0.4),
+            //         borderRadius: BorderRadius.circular(200)
+            //     ),
+            //     child: Icon(Icons.arrow_back,
+            //         size: 10,
+            //         color: Theme.of(context).inputDecorationTheme.iconColor),
+            //   ),
+            // ),
             // Center(
             //   child: IconButton(
             //     onPressed: (){

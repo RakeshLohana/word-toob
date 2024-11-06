@@ -134,9 +134,12 @@ class ContentProvider extends ChangeNotifier{
 
 
 
-      );
+      ).then((value) async{ 
+        await getAllGridSizeModel();
+        printLog("getAllGridSizeModel function is called");
+
+      },);
       notifyListeners();
-      _allGridSizedModel=await iAppRepository.getAllGridSizedModel();
 
       notifyListeners();
       updateGridListDataStatus = Status.loaded;
