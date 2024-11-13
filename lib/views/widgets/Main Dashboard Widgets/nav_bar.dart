@@ -61,7 +61,7 @@ class NormalNavBar extends StatelessWidget {
         "onTap":(){
           menuController.close();
           value.setFindTheWord(true);
-          value.setRandomIndex();
+          value.setRandomIndex(context);
         }
       }
 
@@ -132,7 +132,7 @@ class FindTheWordRow extends StatelessWidget {
         SizedBox(width: sizeWidth,),
         GestureDetector(
           onTap: () {
-            mainDashboardController.setRandomIndex();
+            mainDashboardController.setRandomIndex(context);
             mainDashboardController.clearFindTheWrongList();
           },
           child: Text("Skip",style: Theme.of(context).textTheme.bodyMedium?.copyWith(

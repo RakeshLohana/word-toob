@@ -168,7 +168,9 @@ class MainDashboardController extends ChangeNotifier{
   void onSpeechResult(SpeechRecognitionResult result) {
     lastWords = result.recognizedWords;
     debugPrint(lastWords);
-    int index = gridSizedModel.listData?.indexWhere((gridModel) => gridModel.title == lastWords) ?? -1;
+
+    debugPrint(gridSizedModel.listData.toString());
+    int index = gridSizedModel.listData?.indexWhere((gridModel) => gridModel.title?.toLowerCase() == lastWords.toLowerCase()) ?? -1;
 
 
     if (index != -1) {
@@ -469,10 +471,28 @@ class MainDashboardController extends ChangeNotifier{
 
 
 
-  void setRandomIndex() {
+  void setRandomIndex(BuildContext context) {
     _randomListIndex=Random().nextInt(gridSizedModel.listData!.length-1);
     _targetFindWord=gridSizedModel.listData?[_randomListIndex].title??"";
-    flutterTts.speak( "Find ${_targetFindWord}");
+    // flutterTts.speak( "Find ${_targetFindWord}");
+    if (
+    gridSizedModel.listData != null &&
+        _randomListIndex < gridSizedModel.listData!.length &&
+        gridSizedModel.listData![_randomListIndex].videosPath != null &&
+        gridSizedModel.listData![_randomListIndex].videosPath!.isNotEmpty
+    ) {
+
+      var rand = Random().nextInt(gridSizedModel.listData?[_randomListIndex].videosPath!.length ?? 0);
+
+      Navigator.pushNamed(
+        context,
+        RouteStrings.videoPlayer,
+        arguments: gridSizedModel.listData?[_randomListIndex].videosPath?[rand],
+      );
+    }
+
+
+
 
     notifyListeners();
   }

@@ -62,7 +62,7 @@ class _GridViewWidgetState extends State<GridViewWidget> with SingleTickerProvid
       if(widget.value.foundSuccess){
         widget.value.clearFindTheWrongList();
         widget.value.setFoundSuccess(false);
-        widget.value.setRandomIndex();
+        widget.value.setRandomIndex(context);
       }
 
 
@@ -90,201 +90,228 @@ class _GridViewWidgetState extends State<GridViewWidget> with SingleTickerProvid
                   ),
                 ),
               ),
-      
-      
+
+
               Expanded(
-                child: GridView.builder(
-                  // shrinkWrap: true,
-                  physics: const BouncingScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:  widget.value.gridSizedModel.gridSizeY??2,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: widget.value.gridSizedModel.listData?.length,
-                  itemBuilder: (context, index) {
-                    final GridModel grid=widget.value.gridSizedModel.listData?[index]??GridModel();
-                    final findTheWrongWord=!widget.value.findTheWordWrongList.contains(index);
-                    
-                    
-                    if (widget.value.findTheWord ||widget.value.freePlay==false) {
-                      return Stack(
-                      children: [
-                        Builder(
-                          builder: (context) =>
-                              GestureDetector(
-                                onTap: () {
-                                  if(widget.value.targetFindWord==grid.title){
-                                    widget.value.setFindWordImage(true);
-                                    widget.value.setFoundSuccess(true);
-                                    _onImageTap(MyAssets.correct);
-                    
-                    
-                                  }else{
-                                    widget.value.setFindTheWordWrongList(index);
-                                    widget.value.setFindWordImage(true);
-                                    _onImageTap(MyAssets.wrong);
-                    
-                    
-                                  }
-                                },
-                                child: Container(
-                                    margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: findTheWrongWord? AppColor.cardColor:AppColor.transparent,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color:findTheWrongWord? Colors.white:Colors.transparent, width: 2),
-                                    ),
-                                    child: Center(
-                                      child: Padding(
-                                        padding:  EdgeInsets.symmetric(vertical:context.height*0.02,horizontal: context.width*0.02),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              findTheWrongWord?grid.title??'?':"",
-                                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                color: AppColor.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: context.height*0.028, // Adjust the font size if necessary
-                                              ),
-                                            ),
-                                            SizedBox(height: context.height*0.02), // Add spacing between text and image
-                                            findTheWrongWord?
-                                            Flexible(
-                                              child: grid.imagepath!=null?
-                                              grid.imagepath!.contains("assets")?
-                                              Image.asset(grid.imagepath!,height: context.height*0.5,width: 100,)
-                                                  : Image.file(File(grid.imagepath!),height: context.height*0.5,width: 100,):Container(),
-                    
-                                            ):Container(),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                    
-                                ),
-                              ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final gridWidth = constraints.maxWidth;
+                    final gridHeight = constraints.maxHeight;
+                    final gridSizeX = widget.value.gridSizedModel.gridSizeX ?? 2;
+                    final gridSizeY = widget.value.gridSizedModel.gridSizeY ?? 2;
+
+                    // Calculate the width and height for each grid item
+                    final itemWidth = gridWidth / gridSizeX;
+                    final itemHeight = gridHeight / gridSizeY;
+
+                    // Calculate aspect ratio to make items square
+                    final childAspectRatio = itemWidth / itemHeight;
+
+                    return Center(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+
+                        // shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: gridSizeX,
+                          mainAxisSpacing: 0,
+                          crossAxisSpacing: 0,
+                          childAspectRatio: childAspectRatio,
                         ),
-                    
-                      ],
-                    );
-                    } else {
-                      return CommonFunctions.getCheckforGridShow(isEditPressedYellow: widget.value.editPressedYello, hideImage: grid.hideImage??false, hideTitle: grid.hidetitle??false)?
-                    Builder(
-                      builder: (context) =>
-                       Stack(
-                        children: [
-
-                                GestureDetector(
-                                  onLongPress:(){
-                                    widget.value.hideOrShowEachGrid(widget.contentProvider, index,hideTitle: true,hideImage: true);
-                                  },
-
-                                  onTap: () {
-                                    // value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy );
-                                    widget.value.setItemOnEditState(
-                                        hide: grid.hidetitle??false,
-                                        index,
-                                        context,title:grid.title??'' ,
-
-                                        picture: grid.imagepath??"",
-                                        id: widget.value.gridSizedModel.id??-1,
-                                        videoPath: grid.videosPath??[],
-                                        gridIndex: widget.value.gridIndex );
-                                    if(!widget.value.editPressedYello){
-                                      if(grid.videosPath?.isNotEmpty??false){
-                                        widget.value.setLottie();
-                                        widget.value.flutterTts.speak(  grid.title??"");
-                                        var rand=Random().nextInt(grid.videosPath?.length??0+1);
-                                        Navigator.pushNamed(context, RouteStrings.videoPlayer,arguments: grid.videosPath?[rand]);
-                                      }else{
-                                        widget.value.setLottie();
-                                        widget.value.flutterTts.speak(  grid.title??"");
-
-                                        printLog("Error occured no item  ");
-                                      }
-
-                                    }
+                        itemCount: widget.value.gridSizedModel.listData?.length,
+                        itemBuilder: (context, index) {
+                          final GridModel grid=widget.value.gridSizedModel.listData?[index]??GridModel();
+                          final findTheWrongWord=!widget.value.findTheWordWrongList.contains(index);
 
 
+                          if (widget.value.findTheWord ||widget.value.freePlay==false) {
+                            return Stack(
+                              children: [
+                                Builder(
+                                  builder: (context) =>
+                                      GestureDetector(
+                                        onTap: () {
+                                          if(widget.value.targetFindWord==grid.title){
+                                            widget.value.setFindWordImage(true);
+                                            widget.value.setFoundSuccess(true);
+                                            _onImageTap(MyAssets.correct);
 
 
+                                          }else{
+                                            widget.value.setFindTheWordWrongList(index);
+                                            widget.value.setFindWordImage(true);
+                                            _onImageTap(MyAssets.wrong);
 
-                                  },
-                                  child: Container(
-                                      margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                                      decoration: BoxDecoration(
-                                        color: AppColor.cardColor,
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: Colors.white, width: 2),
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding:  EdgeInsets.symmetric(vertical:context.height*0.02,horizontal: context.width*0.02),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                grid.title??'?',
-                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: AppColor.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: context.height*0.028, // Adjust the font size if necessary
+
+                                          }
+                                        },
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: findTheWrongWord? AppColor.cardColor:AppColor.transparent,
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(color:findTheWrongWord? Colors.white:Colors.transparent, width: 2),
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:  EdgeInsets.symmetric(vertical:context.height*0.0007,horizontal: context.width*0.02),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      findTheWrongWord?grid.title??'?':"",
+                                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                        color: AppColor.white,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: context.height*0.024, // Adjust the font size if necessary
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: context.height*0.02), // Add spacing between text and image
+                                                    findTheWrongWord?
+                                                    Flexible(
+                                                      child: grid.imagepath!=null?
+                                                      grid.imagepath!.contains("assets")?
+                                                      Image.asset(grid.imagepath!,height: context.height*0.8,width: 130,)
+                                                          : Image.file(File(grid.imagepath!),height: context.height*0.8,width: 130,):Container(),
+
+                                                    ):Container(),
+                                                  ],
                                                 ),
                                               ),
-                                              SizedBox(height: context.height*0.02), // Add spacing between text and image
-                                              if (widget.value.settingsWordOnlyShow==1) Flexible(
-                                                child: grid.imagepath!=null? grid.imagepath!.contains("assets")?
-                                                Image.asset(grid.imagepath!,height: context.height*0.5,width: 100,): Image.file(File(grid.imagepath!),height: context.height*0.5,width: 100,):Container(),
+                                            )
 
-                                              ) else Container(),
-                                            ],
-                                          ),
                                         ),
-                                      )
-
-                                  ),
+                                      ),
                                 ),
 
-                          if(widget.value.editPressedYello && grid.hideImage ==true && grid.hidetitle==true)
-                                 Builder(
-                                   builder: (context) =>
-                                       GestureDetector(
-                                         onLongPress:(){
-                                           widget.value.hideOrShowEachGrid(widget.contentProvider, index,hideTitle: false,hideImage: false);
-                                         },
+                              ],
+                            );
+                          } else {
+                            return CommonFunctions.getCheckforGridShow(
+                                isEditPressedYellow: widget.value.editPressedYello,
+                                hideImage: grid.hideImage??false,
+                                hideTitle: grid.hidetitle??false)?
+                            Builder(
+                              builder: (context) =>
+                                  Stack(
+                                    children: [
 
-                                         // onTap: () {
-                                         //   widget.value.setItemOnEditState(
-                                         //       hide: grid.hidetitle??false,
-                                         //       gridIndex: widget.value.gridIndex,
-                                         //       index,context,title: grid.title??"",
-                                         //       picture:grid.imagepath??"",
-                                         //       id:  widget.value.gridSizedModel.id??-1, videoPath: grid.videosPath??[]);
-                                         //
-                                         // },
-                                         child: Container(
-                                           margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                                           decoration: BoxDecoration(
-                                             color: AppColor.lightBlue.withOpacity(0.5),
-                                             borderRadius: BorderRadius.circular(10),
-                                             // border: Border.all(color: Colors.white, width: 2),
-                                           ),// Light blue overlay with opacity
-                                         ),
-                                       ),
-                                 ),
-                        ],
+                                      GestureDetector(
+                                        onLongPress:(){
+                                          widget.value.hideOrShowEachGrid(widget.contentProvider, index,hideTitle: true,hideImage: true);
+                                        },
+
+                                        onTap: () {
+                                          // value.setItemOnEditState(index,context,title: "Happy",picture: MyAssets.happy );
+                                          widget.value.setItemOnEditState(
+                                              hide: grid.hidetitle??false,
+                                              index,
+                                              context,title:grid.title??'' ,
+
+                                              picture: grid.imagepath??"",
+                                              id: widget.value.gridSizedModel.id??-1,
+                                              videoPath: grid.videosPath??[],
+                                              gridIndex: widget.value.gridIndex );
+                                          if(!widget.value.editPressedYello){
+                                            if(grid.videosPath?.isNotEmpty??false){
+                                              widget.value.setLottie();
+                                              widget.value.flutterTts.speak(  grid.title??"");
+                                              var rand=Random().nextInt(grid.videosPath?.length??0+1);
+                                              Navigator.pushNamed(context, RouteStrings.videoPlayer,arguments: grid.videosPath?[rand]);
+                                            }else{
+                                              widget.value.setLottie();
+                                              widget.value.flutterTts.speak(  grid.title??"");
+
+                                              printLog("Error occured no item  ");
+                                            }
+
+                                          }
+
+
+
+
+
+                                        },
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: AppColor.cardColor,
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(color: Colors.white, width: 2),
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:  EdgeInsets.symmetric(vertical:context.height*0.007,horizontal: context.width*0.02),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      grid.title??'?',
+                                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                        color: AppColor.white,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: context.height*0.024, // Adjust the font size if necessary
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: context.height*0.01), // Add spacing between text and image
+                                                    if (widget.value.settingsWordOnlyShow==1) Flexible(
+                                                      child: grid.imagepath!=null? grid.imagepath!.contains("assets")?
+                                                      Image.asset(grid.imagepath!,height: context.height*0.8,width: 130,)
+                                                          : Image.file(File(grid.imagepath!),height: context.height*0.8,width: 130,):Container(),
+
+                                                    ) else Container(),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+
+                                        ),
+                                      ),
+
+                                      if(widget.value.editPressedYello && grid.hideImage ==true && grid.hidetitle==true)
+                                        Builder(
+                                          builder: (context) =>
+                                              GestureDetector(
+                                                onLongPress:(){
+                                                  widget.value.hideOrShowEachGrid(widget.contentProvider, index,hideTitle: false,hideImage: false);
+                                                },
+
+                                                // onTap: () {
+                                                //   widget.value.setItemOnEditState(
+                                                //       hide: grid.hidetitle??false,
+                                                //       gridIndex: widget.value.gridIndex,
+                                                //       index,context,title: grid.title??"",
+                                                //       picture:grid.imagepath??"",
+                                                //       id:  widget.value.gridSizedModel.id??-1, videoPath: grid.videosPath??[]);
+                                                //
+                                                // },
+                                                child: Container(
+                                                  margin: EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColor.lightBlue.withOpacity(0.5),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    // border: Border.all(color: Colors.white, width: 2),
+                                                  ),// Light blue overlay with opacity
+                                                ),
+                                              ),
+                                        ),
+                                    ],
+                                  ),
+                            ):Container();
+                          }
+                        },
                       ),
-                    ):Container();
-                    }
+                    );
                   },
+
                 ),
               ),
             ],
           ),
-      
-      
-      
+
+
+
           if( widget. value.findWordImage )
             Align(
             alignment: Alignment.center,
