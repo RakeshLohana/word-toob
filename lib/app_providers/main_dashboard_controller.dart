@@ -179,6 +179,8 @@ class MainDashboardController extends ChangeNotifier{
       var rand=Random().nextInt(matchedModel.videosPath?.length??0+1);
 
       Navigator.pushNamed(_contextForSpeechToText!, RouteStrings.videoPlayer,arguments: matchedModel.videosPath?[rand]);
+      _speechToTextCheck =false;
+      notifyListeners();
 
     } else {
       debugPrint("No match found for: $lastWords");
